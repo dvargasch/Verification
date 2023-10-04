@@ -1,65 +1,71 @@
-//Emulada
-class fifo_monitor #(parameter pckg_sz = 32,parameter bits=1, parameter terminales = 5);
-    bit pop;
-    bit push;
-    bit pndng;
-    bit [pckg_sz-1:0] d_in;
-    bit [pckg_sz-1:0] d_out;
-    bit [pckg_sz-1:0] fifo_queue[$]; 
-    int ident;
-
-virtual interfaz #(.pckg_sz(pckg_sz), .bits(bits), .terminales(terminales)) vif;
-
-function new(int id);
-	this.pop=0;
-	this.push=0;
-	this.pndng=0;
-	this.d_in=0;
-    this.d_out=0;
-	this.fifo_queue= {};
-    this.ident=id;
-endfunction
-
-//////////////////////////////////////////
-
-
-task pen_update(); //Actualizacion del pending que sale de una FIFO hacia el Bus de datos
+class fifo_monitor #(parameter bits = 1, parameter terminales=5, parameter ancho_pal = 32);
+  bit pop;
+  bit push;
+  bit pndng;
+  bit [ancho_pal-1:0] D_pop;
+  bit [ancho_pal-1:0] queue [$];
+  int iterador;
+  virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) vif;
+  
+  function new(int identify);
+    this.pop = 0;
+    this.push = 0;
+    this.pndng = 0;
+    this.D_pop = 0;
+    this.queue = {};
+    this.iterador = identify;
+  endfunction 
+  
+  task pending_update(); //Actualizacion del pending que sale de una FIFO hacia el Bus de datos
     forever begin
       @(negedge vif.clk);
-      vif.pndng[0][ident] = pndng; 
-      pop = vif.pop[0][ident];
+      vif.pndng[0][iterador] = pndng; 
+      pop = vif.pop[0][iterador];
     end
   endtask
-
+  
   task Dout_uptate(); // Visto desde la FIFO: actualiza el valor de salida de la fifo (o sea el valor de entrada del bus) y el valor de pending 
     forever begin
       @(posedge vif.clk);
-      vif.d_out[0][ident] = fifo_queue[0]; // Indica que el dato de entrada al bus de datos va a estar almacenado en la posicion 
+      vif.D_pop[0][iterador] = queue[0]; // Indica que el dato de entrada al bus de datos va a estar almacenado en la posicion 
       if(pop ==1) begin
-        fifo_queue.pop_front(); //Eliminando el primer elemento de la fifo.
+        queue.pop_front(); //Eliminando el primer elemento de la fifo.
       end 
-      if (fifo_queue.size ==0)begin //Se revisa si el tamaño de la queue (fifo) es 0 implica que no hay dato pendiente que enviar al bus de datos
+      if (queue.size ==0)begin //Se revisa si el tamaño de la queue (fifo) es 0 implica que no hay dato pendiente que enviar al bus de datos
         pndng = 0;
       end
     end
   endtask
-
-
-  function void Din_update(bit [pckg_sz-1:0] dato); 
-    fifo_queue.push_back(dato);    //Ingresa el dato en la fifo.
+  
+  
+  function void Din_update(bit [ancho_pal-1:0] dato); 
+    queue.push_back(dato);    //Ingresa el dato en la fifo.
     pndng = 1;
   endfunction
-endclass 
+endclass
+ 
 
 ///////////////////////////////////////////
 
-class monitor #(parameter ancho_pal = 32,parameter bits=1, parameter terminales = 7)
+class mntr_chckr_#(parameter ancho_pal=32);
+  int id;
+  int dato;
+  int tiempo;
+
   
-  fifo_monitor #(.ancho_pal(ancho_pal), .bits(bits), .terminales(terminales)) ff;
-  trans_monitor #(.ancho_pal(ancho_pal)) transaccion_in, transaccion_out;
-  MNTR_CHCKR_mxb comando_MNTR_CHCKR_mxb;
+  function new ();
+  endfunction;
+endclass
+
+class monitor #(parameter ancho_pal = 32,parameter bits=1, parameter terminales = 5);
   
-  int ident;
+	fifo_monitor #(.ancho_pal(ancho_pal), .bits(bits), .terminales(terminales)) ff;
+	virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) 	vif;
+	//mntr_chckr #(.ancho_pal(ancho_pal)) transaccion_in, transaccion_out;
+  	mntr_chckr #(.ancho_pal(ancho_pal)) transaccion;
+ 	mntr_chckr_mbx mntr_chckr_mbx;
+  
+ int ident;    
   
   function new(int id);
     this.ident = id;
@@ -70,7 +76,8 @@ class monitor #(parameter ancho_pal = 32,parameter bits=1, parameter terminales 
     $display("[%g] Monitor # [%g] Inicia", $time, ident);
 
     forever begin
-     transaccion_in = new;
+     //this.transaccion_in = new ();
+       this.transaccion = new ();
 
       fork
         @(posedge ff.vif.clk) // Esperar al flanco de subida del reloj
@@ -80,29 +87,44 @@ class monitor #(parameter ancho_pal = 32,parameter bits=1, parameter terminales 
  
       @(posedge ff.vif.clk);
       if (ff.pndng == 1) begin
-        transaccion_in.tiempo = $time;
-        transaccion_in.ter_in = ident;
+        this.transaccion.tiempo = $time;
+        this.transaccion.id = ident;
         @(posedge ff.vif.clk);
-        transaccion_in.dato = ff.d_in;
-        MNTR_CHCKR_mxb.put(transaccion_in);
+        this.transaccion.dato = ff.D_pop;
+        this.mntr_chckr_mbx.put(this.transaccion);
         transaccion_in.print("Monitor: Transaccion recibida");
       end
   
-      @(posedge ff.vif.clk);// Monitorear datos que salen
-      transaccion_out = new;
+      //@(posedge ff.vif.clk);// Monitorear datos que salen
+      //this.transaccion_out = new ();
   
-      @(posedge ff.vif.clk);
-      if (ff.pndng == 1) begin
-        ff.popf();
-        transaccion_out.tiempo = $time;
-        transaccion_out.ter_out = ident;
-        @(posedge fifo.vif.clk);
-        transaccion_out.dato = ff.d_out;
-        MNTR_CHCKR_mxb.put(transaccion_out);
-        transaccion_out.print("Monitor: Transaccion enviada");
-      end
+      //@(posedge ff.vif.clk);
+      //if (ff.pndng == 1) begin
+        //ff.popf();
+        //this.transaccion_out.tiempo = $time;
+        //this.transaccion_out.id = ident;
+        //@(posedge fifo.vif.clk);
+        //this.transaccion_out.dato = ff.D_pop;
+        //this.mntr_chckr_mbx.put(this.transaccion_out);
+        //transaccion_out.print("Monitor: Transaccion enviada");
+      //end
       @(posedge ff.vif.clk);
     end
   endtask
 
 endclass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
