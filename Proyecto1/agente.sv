@@ -4,12 +4,20 @@
 
 class agente #(parameter bits=1,  parameter terminales=4, parameter ancho_pal = 32);
   
+  ///////////Mailbox//////////////
+  
   agente_driver_mailbox ag_dr_mx [terminales];//mailbox que conecta al agente y al driver
  // test_agente_mailbox te_ag_mx //mailbox que conecta al agente y al test
   
   test_agent tipo; // Genera los diferentes tipos de test que van a realizarse
   
+  ag_chckr_mbx #(.ancho_pal(ancho_pal)) ag_chckr_mbx;
+  
+  ///////Clases///////////
+  
   transaccion #(.ancho_pal(ancho_pal), .terminales(terminales)) transacciones;
+  
+  ag_chckr	#(.ancho_pal(ancho_pal)) ag_chckr_transaccion;
   
   int num_transacciones_ag;//numero de transacciones
   int retardo_max_ag;//tiempo de retardo maximo
@@ -59,8 +67,17 @@ class agente #(parameter bits=1,  parameter terminales=4, parameter ancho_pal = 
               transacciones.print("Agente: Transacccion:");
               adm[transacciones.Tx].try_put(transacciones);
             end
-          end           
-                 
+          end              
+          
+           trans_especifica: begin  // Esta instrucción genera una transacción específica
+            transaccion =new;
+            transaccion.tipo = tipo;
+            transaccion.retardo = retardo_ag;
+            transaccion.Tx=Ter_in_ag;
+			transaccion.Rx=Ter_out_ag;
+            transaccion.print("Agente: transacción creada");
+            ag_dr_mx[transaccion.Tx].try_put(transaccion);
+          end
           
           trans_retar_min:begin //Transacciones con retardo minimo
             for(int i=0; i<drvrs; i++)begin
