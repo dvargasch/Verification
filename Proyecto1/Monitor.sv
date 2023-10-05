@@ -48,7 +48,7 @@ endclass
 ///////////////////////////////////////////
 
 class mntr_chckr_#(parameter ancho_pal=32);
-  int id;
+  reg [7:0] id;
   int dato;
   int tiempo;
 
@@ -59,11 +59,14 @@ endclass
 
 class monitor #(parameter ancho_pal = 32,parameter bits=1, parameter terminales = 5);
   
+  //Transacción
 	fifo_monitor #(.ancho_pal(ancho_pal), .bits(bits), .terminales(terminales)) ff;
 	virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) 	vif;
-	//mntr_chckr #(.ancho_pal(ancho_pal)) transaccion_in, transaccion_out;
+  
   	mntr_chckr #(.ancho_pal(ancho_pal)) transaccion;
- 	mntr_chckr_mbx mntr_chckr_mbx;
+  
+  // Mailbox
+  mntr_chckr_mbx #(.ancho_pal(ancho_pal)) cm_mntr_chckr_mbx;
   
  int ident;    
   
