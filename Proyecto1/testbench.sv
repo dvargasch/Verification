@@ -1,11 +1,8 @@
 `timescale 1ns/10ps
 `default_nettype none
-`include "interfaz.sv"
-`include "agente.sv"
-`include "Monitor.sv"
-`include "driver.sv"
+`include "interface.sv"
+`include "Driver.sv"
 `include "library.sv"
-
 
 module bus_tb;  
   //Definiendo parametros que recibe el testbench
@@ -45,14 +42,10 @@ module bus_tb;
  //Conectando la interfaz y el DUT
   bs_gnrtr_n_rbtr #(.bits(bits), .drvrs(terminales), .pckg_sz(ancho_pal), .broadcast(broadcast)) Top_bus_inst (.clk(bus_if_inst.clk), .reset(bus_if_inst.rst), .pndng(bus_if_inst.pndng), .push(bus_if_inst.push), .pop(bus_if_inst.pop), .D_pop(bus_if_inst.D_pop), .D_push(bus_if_inst.D_push));
   
+  //Instanciando clases del Driver
   
   
-///////////////////Driver///////////////////////////////
-
-//Instanciando clases del Driver
-  
-  
-  driver #(.bits(bits), .terminales(terminales), .ancho_pal(ancho_pal)) fifo_driver_inst;
+  fifo_entrada #(.terminales(terminales), .ancho_pal(ancho_pal)) fifo_driver_inst;
   
   driver_hijo #(.ancho_pal(ancho_pal), .bits(bits), .terminales(terminales)) driver_hijo_inst;
   
@@ -89,42 +82,4 @@ $finish;
   
 end
   
-//////////////////////Monitor//////////////////////
-  
-//Mailbox
-//mntr_chckr_mbx comando_mntr_chckr_mbx= new ();
-  mntr_chckr_mbx  #(.ancho_pal(ancho_pal)) comando_mntr_chckr_mbx = new ();
-  
-  
-  
-  //Instanciando clases del Monitor
- 
-  fifo_monitor #(.ancho_pal(ancho_pal), .bits(bits), .terminales(terminales)) ff_tb;
-   
-  monitor #(.ancho_pal(ancho_pal), .bits(bits), .terminales(terminales)) mon;
-  
-      
-	initial begin
-      mon= new ();
-      ff_tb= new ();
-    
- ff_tb.mntr_chckr_mbx = cm_mntr_chckr_mbx;
- mon.mntr_chckr_mbx = cm_mntr_chckr_mbx;
-    end
-  
-  /////////////////Agente/////////////////////
-  
-  mntr_chckr_mbx #(.ancho_pal(ancho_pal)) mntr_chckr_mbx = new ();
-  
-  //Instanciando clases del Agente
-  
-      agente #(.ancho_pal(ancho_pal), .bits(bits), .terminales(terminales)) agente;
-      
-  initial begin
-      agente= new ();
-    
- agente.ag_chckr_mbx  = ag_chckr_mbx ;
-    end
-  
- 
 endmodule
