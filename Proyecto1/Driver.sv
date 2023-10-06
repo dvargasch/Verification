@@ -1,6 +1,6 @@
 `include "fifoDriver.sv"
 
-class driver_hijo #(parameter ancho_pal = 32, parameter bits=1, parameter terminales=5);
+class driver #(parameter ancho_pal = 32, parameter bits=1, parameter terminales=5);
   fifo_entrada #(.ancho_pal(ancho_pal), .terminales(terminales)) fifo_d;
   virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) vif_hijo;
   //agent_driver_mailbox  adm; // Se define el manejador adm que apunta al objeto agent_driver_mailbox 
