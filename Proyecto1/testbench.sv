@@ -2,7 +2,7 @@
 `default_nettype none
 `include "interface.sv"
 `include "driver.sv"
-`include "library.sv"
+`include "Library.sv"
 
 module bus_tb;  
   //Definiendo parametros que recibe el testbench
