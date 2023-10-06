@@ -1,8 +1,8 @@
 `timescale 1ns/10ps
 `default_nettype none
 `include "interface.sv"
-`include "driver.sv"
-`include "Library.sv"
+`include "Driver.sv"
+`include "library.sv"
 
 module bus_tb;  
   //Definiendo parametros que recibe el testbench
@@ -49,7 +49,7 @@ module bus_tb;
   
   driver #(.ancho_pal(ancho_pal), .terminales(terminales)) driver_hijo_inst;
   
-  driver_padre #(.ancho_pal(ancho_pal), .terminales(terminales)) driver_padre_inst;
+  driver_ #(.ancho_pal(ancho_pal), .terminales(terminales)) driver_padre_inst;
 
 initial begin
   $dumpfile("Intf.vcd");
@@ -71,7 +71,7 @@ initial begin
   driver_padre_inst = new();
   for (int i=0; i<terminales; i++)begin
     automatic int j = i;
-    driver_padre_inst.driver_h[j].fifo_in.vif = bus_if_inst;
+    driver_padre_inst.driver_m[j].fifo_in.vif = bus_if_inst;
   end
   
   #10;

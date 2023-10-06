@@ -1,80 +1,88 @@
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////Esta clase corresponde al driver////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
 `include "fifoDriver.sv"//libreria con fifo
 
 class driver#(parameter ancho_pal = 32, parameter terminales=4);//parametros
   fifo_entrada #(.ancho_pal(ancho_pal), .terminales(terminales)) fifo_in;//instancia
-  virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) vif_hijo;//interfaz virtual
+  virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) vif_d;//interfaz virtual
   
+  //agent_driver_mailbox  agent_driver_mailbox_; // Manejador que apunta al agent_driver_mailbox 
+  //driver_checker_mailbox driver_checker_mailbox_; // Manejador que apunta al driver_checker_mailbox
   
+  int hold;//variable que controla el tiempo de espera
+  int identificador;//identificador del driver
   
-  //agent_driver_mailbox  adm; // Se define el manejador adm que apunta al objeto agent_driver_mailbox 
-  //driver_checker_mailbox dcm; // Manejador que apunta al driver_checker_mailbox
-  int HOLD;
-  int iterador;
-
+  //constructor
   function new (int identify);
-    this.iterador = identify;
-    this.fifo_in = new(identify);
-    this.fifo_in.vif = vif_hijo;
-    
+    this.identificador = identify; // Asigna el identificador
+    this.fifo_in = new(identify);// Inicializa la instancia de la FIFO
+    this.fifo_in.vif = vif_d;//asigna la interfaz virtual vif_d a la fifo
   endfunction 
   
   task inicia();
-    $display ("Driver # [%g] se inicializa en tiempo [%g]",iterador,$time);
+    $display ("Driver numero [%g] se inicializa en el tiempo [%g]",identificador,$time);
+    
+    //ejecuta tareas en paralelo
     fork
-      fifo_in.pop_();
-      fifo_in.Dout_uptate();
+      fifo_in.pop_();//realiza el pop
+      fifo_in.Dout_uptate();//actualiza el valor de salida
     join_none
     
+    @(posedge fifo_in.vif.clk);
+    fifo_in.vif.rst=1;//se resetea la fifo simulada cuando se detecta el flanco positivo
+    @(posedge fifo_in.vif.clk);
     
-    @(posedge fifo_in.vif.clk);
-    fifo_in.vif.rst=1;
-    @(posedge fifo_in.vif.clk);
     forever begin 
-      trans_bus #(.ancho_pal(ancho_pal), .terminales(terminales)) transacciones;
-      fifo_in.vif.rst=0;
-      fifo_in.vif.D_push[0][iterador] =0;
-      fifo_in.vif.pndng [0][iterador] =1;
+      trans #(.ancho_pal(ancho_pal), .terminales(terminales)) transacciones;
+      fifo_in.vif.rst=0;//señal de reinicio
+      fifo_in.vif.D_push[0][identificador] =0;//se desactiva el push
+      fifo_in.vif.pndng [0][identificador] =1;//transacciones pendientes
       
-      $display("Driver # [%g] esperando transaccion [%g]",iterador,$time);
-      HOLD = 0;
+      $display("Driver numero [%g] espera transaccion en el tiempo [%g]",identificador,$time);
+      
+      hold = 0;
       transacciones = new();
+      
       @(posedge fifo_in.vif.clk);
-      //adm.get(transacciones); //Conecta mailbox al handler que apunta al bus de transacciones
-      $display("Driver # [%g] recibe transaccion en tiempo [%g]",iterador,$time);
-      while(HOLD<transacciones.retardo) begin
+      $display("Driver numero [%g] ha recibido la transaccion en el tiempo [%g]",identificador,$time);
+      
+      for (int i;hold<transacciones.retardo; i++) begin // este for hace que se espere segun el retardo
         @(posedge fifo_in.vif.clk);
-        HOLD=HOLD +1;
+        hold = hold +1;
       end
       
-      if(transacciones.Tx ==iterador)begin
+      if(transacciones.Term_out == identificador)begin
         transacciones.tiempo = $time;
+        
         @(posedge fifo_in.vif.clk);
-        fifo_in.push_(transacciones.dato);//Ingresa el dato dado por la variable DATO en el Trans_bus y lo agrega a la variable de Din_update de la clase fifo_d
-        $display("Driver[%g]: transaccion completada en tiempo [%g]",iterador,$time);
-        //dcm.put(transacciones); //Envia la transaccion al checker desde el bus de transacciones
+        fifo_in.push_(transacciones.dato);//ingresa el dato en la fifo
+        $display("Driver numero [%g] ha completado su transaccion en el tiempo [%g]",identificador,$time);
       end
     end
   endtask
 endclass
 
+class driver_ #(parameter ancho_pal = 32, parameter terminales = 4);
+  driver #(.ancho_pal(ancho_pal), .terminales(terminales)) driver_m [terminales]; 
+  virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) vif_dr;
 
-class driver_padre #(parameter ancho_pal =32, parameter bits=1, parameter terminales =5);
-  driver #(.ancho_pal(ancho_pal), .terminales(terminales)) driver_h [terminales]; 
-  virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) vif_padre;
-  // handler que apunta a la clase driver_hijo
   function new();
     for(int i=0; i< terminales; i++)begin
-      driver_h[i]=new(i);
-      driver_h[i].vif_hijo= vif_padre;// Genera varias instancias de la clase driver_hijo
+      driver_m[i]=new(i);//crea instancias
+      driver_m[i].vif_d= vif_dr;// Genera varias instancias y asigna la interfaz 
     end
   endfunction
   
-  task inicia();
+  task inicia();//simulacion de los controladores 
     for (int i=0; i< terminales; i++)begin
       fork
         automatic int j=i;
         begin
-          driver_h[j].inicia(); // Hace un for para que los procesos hijos se ejecuten de forma simultánea.
+          driver_m[j].inicia(); // Hace un for para que los procesos hijos se ejecuten de forma simultánea.
         end
       join_none
     end	
