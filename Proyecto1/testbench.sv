@@ -1,8 +1,8 @@
 `timescale 1ns/10ps
 `default_nettype none
 `include "interface.sv"
-`include "Driver.sv"
-`include "library.sv"
+`include "driver.sv"
+`include "Library.sv"
 
 module bus_tb;  
   //Definiendo parametros que recibe el testbench

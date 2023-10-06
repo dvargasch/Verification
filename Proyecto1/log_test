@@ -1,0 +1,78 @@
+Command: vcs -Mupdate testbench.sv -o output -full64 -sverilog -kdb -lca -debug_acc+all \
+-debug_region+cell+encrypt -l log_test +lint=TFIPC-L -cm line+tgl+cond+fsm+branch+assert \
+
+                         Chronologic VCS (TM)
+       Version R-2020.12-SP2_Full64 -- Fri Oct  6 01:15:12 2023
+
+                    Copyright (c) 1991 - 2021 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+            or distribution of this software is strictly prohibited.
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file 'testbench.sv'
+Parsing included file 'interface.sv'.
+Back to file 'testbench.sv'.
+Parsing included file 'driver.sv'.
+Parsing included file 'fifoDriver.sv'.
+Back to file 'driver.sv'.
+
+Warning-[FLVU] For loop variable uninitialized
+driver.sv, 53
+  Loop variable 'i' is declared without any initial value.
+  Please make sure that the declarations in the 'for' loop have valid initial 
+  value.
+
+Back to file 'testbench.sv'.
+Parsing included file 'Library.sv'.
+Back to file 'testbench.sv'.
+Top Level Modules:
+       prll_d_reg
+       prll_d_ltch_no_rst
+       prll_d_ltch
+       pos_edge
+       neg_edge
+       bs_gnrtr
+       bus_tb
+TimeScale is 1 ns / 10 ps
+VCS Coverage Metrics Release R-2020.12-SP2_Full64 Copyright (c) 1991-2020 by Synopsys Inc.
+
+Warning-[INTFDV] VCD dumping of interface/program/package
+testbench.sv, 56
+  Selective VCD dumping of interface 'interfaz' is not supported.  Selective 
+  VCD dumping for interfaces, packages and programs is not supported.
+  Use full VCD dumping '$dumpvars(0)', or use VPD or FSDB dumping, recompile 
+  with '-debug_access'.
+
+Notice: Ports coerced to inout, use -notice for details
+Starting vcs inline pass...
+17 modules and 0 UDP read.
+recompiling package vcs_paramclassrepository
+recompiling module interfaz
+recompiling module bus_tb
+3 of 17 modules done
+	However, due to incremental compilation, only 3 modules need to be compiled. 
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+ld -shared  -Bsymbolic --no-relax  -o .//../output.daidir//_cuarc0.so objs/amcQw_d.o \
+
+rm -f _cuarc0.so
+if [ -x ../output ]; then chmod a-x ../output; fi
+g++  -o ../output      -rdynamic  -Wl,-rpath='$ORIGIN'/output.daidir -Wl,-rpath=./output.daidir \
+-Wl,-rpath=/mnt/vol_NFS_rh003/tools/vcs/R-2020.12-SP2/linux64/lib -L/mnt/vol_NFS_rh003/tools/vcs/R-2020.12-SP2/linux64/lib \
+-Wl,-rpath-link=./  /usr/lib64/libnuma.so.1     _706614_archive_1.so _prev_archive_1.so \
+_cuarc0.so  SIM_l.o      rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o \
+rmar_llvm_0_0.o           -lvirsim -lerrorinf -lsnpsmalloc -lvfs    -lvcsnew -lsimprofile \
+-lreader_common /mnt/vol_NFS_rh003/tools/vcs/R-2020.12-SP2/linux64/lib/libBA.a -luclinative \
+/mnt/vol_NFS_rh003/tools/vcs/R-2020.12-SP2/linux64/lib/vcs_tls.o   -Wl,-whole-archive \
+-lvcsucli    -Wl,-no-whole-archive        _vcs_pli_stub_.o   /mnt/vol_NFS_rh003/tools/vcs/R-2020.12-SP2/linux64/lib/vcs_save_restore_new.o \
+/mnt/vol_NFS_rh003/tools/verdi/R-2020.12-SP2/share/PLI/VCS/LINUX64/pli.a -ldl  -lc \
+-lm -lpthread -ldl 
+../output up to date
+CPU time: .751 seconds to compile + .363 seconds to elab + .310 seconds to link
+Verdi KDB elaboration done and the database successfully generated: 0 error(s), 0 warning(s)
