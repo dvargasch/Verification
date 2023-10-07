@@ -5,7 +5,7 @@ class fifo_monitor #(parameter bits = 1, parameter terminales=5, parameter ancho
   bit pndng;
   bit [ancho_pal-1:0] D_pop;
   bit [ancho_pal-1:0] queue [$];
-  int iterador;
+  int identificador;
   virtual interfaz #(.ancho_pal(ancho_pal), .terminales(terminales)) vif;
   
   // Constructor de la clase
@@ -16,7 +16,7 @@ class fifo_monitor #(parameter bits = 1, parameter terminales=5, parameter ancho
     this.pndng = 0;
     this.D_pop = 0;
     this.queue = {};
-    this.iterador = identify;
+    this.identificador = identify;
   endfunction 
   
    //Actualizacion del pending que sale de una FIFO hacia el Bus de datos
@@ -24,8 +24,8 @@ class fifo_monitor #(parameter bits = 1, parameter terminales=5, parameter ancho
   task pending_update();
     forever begin
       @(negedge vif.clk);
-      vif.pndng[0][iterador] = pndng; 
-      pop = vif.pop[0][iterador];
+      vif.pndng[0][identificador] = pndng; 
+      pop = vif.pop[0][identificador];
     end
   endtask
   
@@ -34,7 +34,7 @@ class fifo_monitor #(parameter bits = 1, parameter terminales=5, parameter ancho
   task Dout_uptate();  
     forever begin
       @(posedge vif.clk);
-      vif.D_pop[0][iterador] = queue[0]; // Indica que el dato de entrada al bus de datos va a estar almacenado en la posicion 
+      vif.D_pop[0][identificador] = queue[0]; // Indica que el dato de entrada al bus de datos va a estar almacenado en la posicion 
       if(pop ==1) begin
         queue.pop_front(); //Eliminando el primer elemento de la fifo.
       end 
