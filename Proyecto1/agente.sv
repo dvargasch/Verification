@@ -61,9 +61,9 @@ class agente #(parameter bits=1,  parameter terminales=4, parameter ancho_pal = 
               transacciones.max_retardo = max_retardo_ag;
               transacciones.tipo = tipo;
               transacciones.randomize();
-              transacciones.dato = {transacciones.Rx, transacciones.Tx, transacciones.informacion}; 
+              transacciones.dato = {transacciones.Term_in, transacciones.Term_out, transacciones.informacion}; 
               transacciones.print("Agente: Transacción:");
-              ag_dr_mx[transacciones.Tx].try_put(transacciones);
+              ag_dr_mx[transacciones.Term_out].try_put(transacciones);
             end
           end
           
@@ -74,13 +74,13 @@ class agente #(parameter bits=1,  parameter terminales=4, parameter ancho_pal = 
               transacciones.max_retardo_ag = max_retardo_ag;
               transacciones.tipo = tipo;
               transacciones.randomize();
-              transacciones.Rx = {8{1'b1}};
-              transacciones.dato = {transacciones.Rx, transacciones.Tx, transacciones.informacion}; 
+              transacciones.Term_in = {8{1'b1}};
+              transacciones.dato = {transacciones.Term_in, transacciones.Term_out, transacciones.informacion}; 
               transacciones.print("Agente: Transacción:");
-              adm[transacciones.Tx].try_put(transacciones);
-              transacciones.Rx = 0;
+              adm[transacciones.Term_out].try_put(transacciones);
+              transacciones.Term_in = 0;
               transacciones.print("Agente: Transacción:");
-              adm[transacciones.Tx].try_put(transacciones);
+              adm[transacciones.Term_out].try_put(transacciones);
             end
           end              
           
@@ -88,10 +88,10 @@ class agente #(parameter bits=1,  parameter terminales=4, parameter ancho_pal = 
             transaccion = new;
             transaccion.tipo = tipo;
             transaccion.retardo = retardo_ag;
-            transaccion.Tx = Ter_in_ag;
-            transaccion.Rx = Ter_out_ag;
+            transaccion.Term_out = Ter_in_ag;
+            transaccion.Term_in = Ter_out_ag;
             transaccion.print("Agente: Transacción creada");
-            ag_dr_mx[transaccion.Tx].try_put(transaccion);
+            ag_dr_mx[transaccion.Term_out].try_put(transaccion);
           end
           
           trans_retar_min: begin // Transacciones con retardo mínimo
@@ -101,9 +101,9 @@ class agente #(parameter bits=1,  parameter terminales=4, parameter ancho_pal = 
               transacciones.tipo = tipo;
               transacciones.randomize();
               transacciones.retardo = 1;
-              transaccion.dato = {transacciones.Rx, transacciones.Tx, transacciones.informacion};
+              transaccion.dato = {transacciones.Term_in, transacciones.Term_out, transacciones.informacion};
               transacciones.print("Agente: Transacción:");
-              adm[transacciones.Rx].try_put(transacciones);
+              adm[transacciones.Term_in].try_put(transacciones);
             end
           end       
   
@@ -114,9 +114,9 @@ class agente #(parameter bits=1,  parameter terminales=4, parameter ancho_pal = 
                 transacciones.max_retardo = max_retardo_ag;
                 transacciones.tipo = tipo;
                 transacciones.randomize();
-                transacciones.Rx = i;
-                transaccion.Tx = j;
-                transacciones.dato = {transacciones.Rx, transaccion.Tx, transaccion.informacion};
+                transacciones.Term_in = i;
+                transaccion.Term_out = j;
+                transacciones.dato = {transacciones.Term_in, transaccion.Term_out, transaccion.informacion};
                 
                 // Evitar enviar a sí misma la terminal
                 if (j != i) begin
