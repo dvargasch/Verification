@@ -1,8 +1,10 @@
 //Clases para transacciones
 
-class mntr_score #(parameter ancho_pal=32);
+class mntr_score #(parameter pckg_sz=32);
   
   int dato;
+  int tiempo;
+  int id;
   
   function new();
     
