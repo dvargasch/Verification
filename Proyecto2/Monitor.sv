@@ -1,4 +1,3 @@
-
 `include "Clases.sv"
 
 /*
@@ -13,7 +12,7 @@
   
   */
 
-class monitor #(parameter ancho_pal=32);//poner parametros
+class monitor #(parameter pckg_sz=32);//poner parametros
   
   //mailbok
   mntr_score_mbx mntr_score_mbx; // el segundo es el que está adentro del monitor
@@ -27,6 +26,7 @@ class monitor #(parameter ancho_pal=32);//poner parametros
   
   function new (int id);
     this.id_ = id;
+    
     $display("Monitor %g",id);
     
   endfunction
@@ -44,9 +44,11 @@ class monitor #(parameter ancho_pal=32);//poner parametros
       @(posedge this.v_if.clk); //Luego pasarlo a la v.interfaz
       if (this.v_if.pndng[this.id_]==1) begin
         transaccion=new();
-        transaccion.dato=this.v_if.data_out[this.id_]; 
+        transaccion.dato=this.v_if.data_out[this.id_];
+        transaccion.tiempo = $time;
+        transaccion.id = this.id_;
         mntr_score_mbx.put(transaccion);
-        $display("Se recibe este dato: %b", this.v_if.data_out[this.id_]);
+        $display("Se recibe este dato: %b, del monitor %g, y en un tiempo: %g" ,this.v_if.data_out[this.id_],this.id_, $time, );
       
       end
     end
