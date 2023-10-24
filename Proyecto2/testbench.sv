@@ -4,11 +4,13 @@
 //`include "Clases.sv"
 `include "Router_library.sv"
 `include "interfaz.sv"
+`include "scoreboard.sv"
+
 
 module Testmonitor;
   
   //Parametros
-  parameter ancho_pal_tb =40; // todos los parametros definidos aquí
+  parameter pckg_sz_tb =40; // todos los parametros definidos aquí
   reg clk_tb=0;
   
   parameter pckg_sz = 40;
@@ -43,10 +45,13 @@ end
   
   //Mailbox
   //typedef mailbox #(mntr_score) mntr_score_mbx;
+  
   mntr_score_mbx mntr_score_mbx =new();// siempre inicializar
   
   //Instanciar modulos
-  monitor #(.ancho_pal(ancho_pal_tb)) monitor_tb[ROWS*2+COLUMS*2];//Así se parametriza
+  monitor #(.pckg_sz(pckg_sz_tb)) monitor_tb[ROWS*2+COLUMS*2];//Así se parametriza
+  scoreboard #(.pckg_sz(pckg_sz_tb)) scoreboard_tb[ROWS*2+COLUMS*2];
+  
 
   
 	initial begin
@@ -70,6 +75,10 @@ end
       monitor_tb[i].v_if = v_if;
       monitor_tb[i].mntr_score_mbx = mntr_score_mbx;
       
+      scoreboard_tb=new;
+      //scoreboard_tb.v_if = v_if;
+      //scoreboard_tb.mntr_score_mbx = mntr_score_mbx;
+      
     end
     
     for (int i = 0; i<ROWS*2+COLUMS*2; i++ ) begin
@@ -79,6 +88,7 @@ end
         automatic int Q=i;
       
         monitor_tb[Q].run(); 
+        scoreboard_tb.run();
         
       join_none;
       
