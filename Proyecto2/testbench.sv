@@ -1,121 +1,87 @@
 `timescale 1ns/10ps
-`default_nettype none
-`include "Monitor.sv"
-//`include "Clases.sv"
 `include "Router_library.sv"
-`include "interfaz.sv"
+`include "driver.sv"
+`include "monitor.sv"
+`include "agente.sv"
+`include "generador.sv"
 `include "scoreboard.sv"
+`include "ambiente.sv"
+`include "test.sv"
 
 
-module Testmonitor;
+module testbench();
+  parameter devices_tb = 16; //cantidad de dispositivos
+  parameter rows_tb = 4; //cantidad de filas
+  parameter columns_tb = 4; //cantidad de columnas
+  parameter pckg_sz_tb = 40; //ancho de la palabra
+  parameter fifo_depth_tb = 4; //profundidad de la fifo
   
-  //Parametros
-  parameter pckg_sz_tb =40; // todos los parametros definidos aquí
-  reg clk_tb=0;
-  
-  parameter pckg_sz = 40;
-  parameter fifo_size = 4;
-  parameter broadcast = {pckg_sz-18{1'b1}};
-  parameter id_column = 0;
-  parameter id_row = 0;
-  parameter COLUMS = 4;
-  parameter ROWS = 4;
-  parameter Drivers = COLUMS*2+ROWS*2;
-  
-  interfaz #(.ROWS(ROWS), .COLUMS(COLUMS), .pckg_sz(pckg_sz),.fifo_depth(fifo_size)) v_if (.clk(clk_tb));
-  
-  
-
-  mesh_gnrtr #(.ROWS(ROWS), .COLUMS(COLUMS), .pckg_sz(pckg_sz),.fifo_depth(fifo_size),.bdcst(broadcast)) DUT (
-  .clk(clk_tb),
-  .reset(v_if.reset),
-  .pndng(v_if.pndng),
-  .data_out(v_if.data_out),
-  .popin(v_if.popin),
-  .pop(v_if.pop),
-  .data_out_i_in(v_if.data_out_i_in),
-  .pndng_i_in(v_if.pndng_i_in)
-  );
-  
-  initial begin
-  $dumpfile("test.vcd");
-  $dumpvars(0,Testmonitor);
-end
-  
-  
-  //Mailbox
-  //typedef mailbox #(mntr_score) mntr_score_mbx;
+  reg clk_tb; //parametro para reloj
   
   mntr_score_mbx mntr_score_mbx =new();// siempre inicializar
+  test_generador_mbx test_generador_mbx_tb =new();//mailbox entre el test y el generador
   
-  //Instanciar modulos
-  monitor #(.pckg_sz(pckg_sz_tb)) monitor_tb[ROWS*2+COLUMS*2];//Así se parametriza
-  scoreboard #(.pckg_sz(pckg_sz_tb)) scoreboard_tb[ROWS*2+COLUMS*2];
+  ambiente  #(.rows(rows_tb), .columns(columns_tb), .pckg_sz(pckg_sz_tb), .f_depth(fifo_depth_tb), .drvrs(devices_tb)) ambiente_tb;//instancia del ambiente
+  test #(.rows(rows_tb), .columns(columns_tb), .pckg_sz(pckg_sz_tb), .f_depth(fifo_depth_tb), .drvrs(devices_tb)) test_tb;//instancia del test
+  interfaz #(.rows(rows_tb), .columns(columns_tb),.pckg_sz(pckg_sz_tb),.f_depth(fifo_depth_tb)) interfaz_tb (.clk(clk_tb));//instancia de la interfaz
   
-
+  // conexion con el DUT
+  mesh_gnrtr #(.ROWS(rows_tb), .COLUMS(columns_tb), .pckg_sz(pckg_sz_tb),.fifo_depth(fifo_depth_tb)) DUT (
+    .clk(clk_tb),
+    .reset(interfaz_tb.reset),
+    .pndng(interfaz_tb.pndng),
+    .data_out(interfaz_tb.data_out),
+    .popin(interfaz_tb.popin),
+    .pop(interfaz_tb.pop),
+    .data_out_i_in(interfaz_tb.data_out_i_in),
+    .pndng_i_in(interfaz_tb.pndng_i_in));
   
-	initial begin
-		forever begin
-  		 #1 clk_tb = ~clk_tb; 
-		end
-	end
+  //clock
+  initial begin
+    forever begin
+      #5
+      clk_tb = ~clk_tb;
+    end
+  end
   
   initial begin
+    clk_tb = 0;
+    interfaz_tb.reset = 1;    
+    #50
+    interfaz_tb.reset = 0;
+  end
+  
+  initial begin 
+    test_tb = new();
+    ambiente_tb = new();
+    ambiente_tb.display();
     
-    v_if.reset=1;
+    test_tb.test_gen_mb_t = test_generador_mbx_tb;
+    ambiente_tb.generador_amb.test_gen_mb_g = test_generador_mbx_tb;
     
-    #150
     
-     v_if.reset=0;
+    fork//inicializar test y ambiente
+      test_tb.run();
+      ambiente_tb.run();
+    join_none 
     
-    for (int i = 0; i<ROWS*2+COLUMS*2; i++ ) begin
-     
-      
-      monitor_tb[i]=new(i);
-      monitor_tb[i].v_if = v_if;
-      monitor_tb[i].mntr_score_mbx = mntr_score_mbx;
-      
-      scoreboard_tb=new;
-      //scoreboard_tb.v_if = v_if;
-      //scoreboard_tb.mntr_score_mbx = mntr_score_mbx;
+    // Conexión de los controladores al DUT y la interfaz
+    for (int i = 0; i < devices_tb; i++ ) begin
+      automatic int k = i;
+      ambiente_tb.driver_amb[k].fifo_dr_d.interfaz_f = interfaz_tb;
+      ambiente_tb.monitor_amb[k].vif_m = interfaz_tb;
       
     end
-    
-    for (int i = 0; i<ROWS*2+COLUMS*2; i++ ) begin
-     
-      fork
-        
-        automatic int Q=i;
-      
-        monitor_tb[Q].run(); 
-        scoreboard_tb.run();
-        
-      join_none;
-      
-    end
-    
-    #100;
-    
-    for (int i = 0; i<ROWS*2+COLUMS*2; i++ ) begin
-    v_if.pndng_i_in[i] = 0;
-    v_if.data_out_i_in[i]=0;
-  end
-  for (int i = 0; i<2; i++ ) begin
-    v_if.data_out_i_in[i] =40'b0000000000000011000000000000000000000011;
-    v_if.pndng_i_in[i]=1;
-  end
-    #10;
-    
-    for (int i = 0; i<2; i++ ) begin
-  
-      v_if.pndng_i_in[i]=0;
-  end
-    
-    #100;
-  	$finish;
-    
   end
   
+  initial begin
+    $dumpfile("prueba.vcd");
+    $dumpvars(0,testbench);
+  end
   
-  
+  initial begin
+    #50000;
+    ambiente_tb.t_run();
+    $finish;
+  end
 endmodule
