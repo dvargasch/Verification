@@ -6,13 +6,15 @@ class ambiente  #(parameter rows = 4, parameter columns = 4, parameter pckg_sz =
   	Agente #(.ROWS(rows), .COLUMS(columns), .pckg_sz(pckg_sz), .fifo_depth(f_depth), .drvrs(drvrs)) agente_amb;
     Generador #(.drvrs(drvrs), .pckg_sz(pckg_sz)) generador_amb;
   
-  scoreboard #(.drvrs(drvrs), .ROWS(rows), .COLUMS(columns), .pckg_sz(pckg_sz)) scoreboard_amb;
+  scoreboard #(.ROWS(rows), .COLUMS(columns), .pckg_sz(pckg_sz)) scoreboard_amb;
   
 
     agent_driver_mb #(.ROWS(rows), .COLUMS(columns), .pckg_sz(pckg_sz)) agent_driver_mb_amb [drvrs];
+  
     gen_agent_mb gen_agent_mb_amb;
     test_generador_mbx test_gen_mb_amb;
     mntr_score_mbx mntr_score_mbx =new();
+  drv_chckr_mbx drv_chckr_mbx=new();
 
     function new();
         for(int i = 0; i < drvrs; i++) begin
@@ -21,6 +23,7 @@ class ambiente  #(parameter rows = 4, parameter columns = 4, parameter pckg_sz =
 	    end
 		this.gen_agent_mb_amb = new();
   		this.test_gen_mb_amb = new ();
+        //this.drv_chckr_mbx=new(); 
 
 		this.agente_amb = new();
 		this.agente_amb.gen_agent_mb_a = gen_agent_mb_amb;
@@ -29,11 +32,13 @@ class ambiente  #(parameter rows = 4, parameter columns = 4, parameter pckg_sz =
 		this.generador_amb.test_gen_mb_g = test_gen_mb_amb;
         this.scoreboard_amb= new();
         this.scoreboard_amb.mntr_score_mbx = mntr_score_mbx;
+        this.scoreboard_amb.drv_chckr_mbx = drv_chckr_mbx;
 
 		for (int i = 0; i<drvrs; i++ ) begin
 			automatic int k = i;
 			this.driver_amb[k] = new(k);
             this.driver_amb[k].agent_driver_mb_d = agent_driver_mb_amb[k];
+            this.driver_amb[k].drv_chckr_mbx = drv_chckr_mbx;
              this.monitor_amb[k] = new(k);
              this.monitor_amb[k].mntr_score_mbx = mntr_score_mbx;
             this.agente_amb.agent_driver_mb_a[k] = agent_driver_mb_amb[k];
@@ -43,7 +48,8 @@ class ambiente  #(parameter rows = 4, parameter columns = 4, parameter pckg_sz =
 
 	task run();
 		fork
-            this.scoreboard_amb.run();
+            this.scoreboard_amb.run_rec();
+            this.scoreboard_amb.run_ent();
             this.agente_amb.run();
 			this.generador_amb.run();
             for(int i = 0; i<drvrs; i++ ) begin
