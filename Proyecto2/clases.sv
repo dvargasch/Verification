@@ -66,6 +66,18 @@ class mntr_score #( parameter ROWS = 4, parameter COLUMS = 4, parameter pckg_sz 
   
 endclass
 
+class drv_chckr #( parameter ROWS = 4, parameter COLUMS = 4, parameter pckg_sz = 40);
+  
+  bit [pckg_sz-1:0] dato;
+  bit modo;
+  int id;
+  int tiempo;
+  //bit [pckg_sz-18:0] dato;
+  bit [3:0] c_fila;
+  bit [3:0] c_columna;
+  
+endclass
+
 ///////////////////
 ////Mailboxes//////
 ///////////////////
@@ -75,6 +87,7 @@ typedef mailbox #(trans_gen_agent) gen_agent_mb; // Mailbox Generador - Agente
 typedef mailbox #(trans_test_gen) test_generador_mbx;
 
 typedef mailbox #(mntr_score) mntr_score_mbx;//monitor
+typedef mailbox #(drv_chckr) drv_chckr_mbx;//driver
 
 typedef enum {Variab, aleat} _nemo_ag_dato;
 typedef enum {Normal, Direccion_invalida, Fuente_invalida, send_self} _nemo_ag_modo;
