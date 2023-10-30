@@ -132,6 +132,29 @@ class agente #(parameter ROWS = 4, parameter COLUMS = 4, parameter pckg_sz = 40,
             trans_agent_driver_a.static_source.constraint_mode(1);//para que no cambie la fuente
           end
           
+          
+            retardo_aleatorio_0:begin
+            trans_agent_driver_a.modo_0.constraint_mode(1); //para que no tenga un modo definido
+            trans_agent_driver_a.modo_1.constraint_mode(0); //para que no tenga un modo definido
+            trans_agent_driver_a.itself.constraint_mode(0); //para que no se mande a si mismo
+            trans_agent_driver_a.min_delay.constraint_mode(0);//para que el retardo
+            trans_agent_driver_a.delay_random.constraint_mode(1);//para que no se aleatorice
+            trans_agent_driver_a.valid_source.constraint_mode(1); //la fuente debe existir
+            trans_agent_driver_a.valid_address.constraint_mode(1);//direccion valida
+            trans_agent_driver_a.static_source.constraint_mode(1);//para que no cambie la fuente
+          end
+          
+            retardo_aleatorio_1:begin
+              trans_agent_driver_a.modo_0.constraint_mode(0); //para que no tenga un modo definido
+              trans_agent_driver_a.modo_1.constraint_mode(1); //para que no tenga un modo definido
+            trans_agent_driver_a.itself.constraint_mode(0); //para que no se mande a si mismo
+            trans_agent_driver_a.min_delay.constraint_mode(0);//para que el retardo
+            trans_agent_driver_a.delay_random.constraint_mode(1);//para que no se aleatorice
+            trans_agent_driver_a.valid_source.constraint_mode(1); //la fuente debe existir
+            trans_agent_driver_a.valid_address.constraint_mode(1);//direccion valida
+            trans_agent_driver_a.static_source.constraint_mode(1);//para que no cambie la fuente
+          end
+          
           invalid_address:begin
             trans_agent_driver_a.valid_source.constraint_mode(1);//existe la fuente
             trans_agent_driver_a.valid_address.constraint_mode(0);//no existe la direccion
