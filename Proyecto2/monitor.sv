@@ -2,7 +2,7 @@ class monitor #(parameter drvrs = 4, parameter ROWS = 4, parameter COLUMS = 4, p
   
   
   virtual interfaz #(.ROWS(ROWS), .COLUMS(COLUMS), .pckg_sz(pckg_sz), .fifo_depth(fifo_depth)) vif_m;
-  bit [pckg_sz-1:0] almacena[$]; 
+  //bit [pckg_sz-1:0] almacena[$]; 
     int id;
   
   ////////////Mailbox/////////////////
@@ -13,9 +13,9 @@ class monitor #(parameter drvrs = 4, parameter ROWS = 4, parameter COLUMS = 4, p
   
 
   function new(int id);
-        this.almacena = {}; 
+        //this.almacena = {}; 
         this.id = id;
-    $display("[%g] Funcionando Monitor [%g]", $time, id);
+    $display("Monitor [%g] ha inicializado en [%g]", id, $time);
     endfunction
 
     task run(); 
@@ -25,12 +25,13 @@ class monitor #(parameter drvrs = 4, parameter ROWS = 4, parameter COLUMS = 4, p
             if (this.vif_m.pndng[this.id] == 1) begin 
               this.vif_m.pop[this.id] = 1; 
               this.transaccion=new();
-              this.transaccion.dato= this.vif_m.data_out[this.id];
+              this.transaccion.d= this.vif_m.data_out[this.id];
+              this.transaccion.dato= this.vif_m.data_out[this.id][pckg_sz-9:0];
               this.transaccion.id= this.id;
               this.transaccion.tiempo= $time;
               this.transaccion.modo= this.vif_m.data_out[this.id][pckg_sz-17];
               //this.almacena.push_back(this.vif_m.data_out[this.id]); 
-              $display("[%g] El monitor %d tiene el dato %b", $time, this.id, this.vif_m.data_out[id]);
+              $display("[%g] El monitor [%g] recibe el dato [%b] ", $time, this.id, this.vif_m.data_out[id]);
               
                 //foreach (almacena[i]) begin
             
