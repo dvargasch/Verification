@@ -1,30 +1,68 @@
 class driver extends uvm_driver #(transaction);
+  
   `uvm_component_utils(driver)
-
-//constructor explicito
-  function new(string name = "driver", uvm_component parent = null);
-    super.new(name, parent);
+  
+  virtual router_if v_if; //interfaz virtual
+  
+  int num;
+//  int count = 0;
+  
+  //constructor para el driver
+  function new(string name,uvm_component parent);
+    super.new(name,parent);
   endfunction
+  
+  //fase de construccion 
+  function void build_phase(uvm_phase phase);
+    if(!uvm_config_db#(virtual router_if)::get(this, "", "v_if", v_if)) begin
+      `uvm_error("","uvm_config_db::get failed")
+    end
+  endfunction
+  
+  //fase de ejecucion
+  task run_phase(uvm_phase phase);
+    v_if.reset = 1;
+    
+    
+    @(posedge v_if.clk);
+    #1;
+    v_if.reset = 0;
+    
+  //phase.raise_objection(this);  
+    
+ forever begin   
+    
+   seq_item_port.get_next_item(req);
 
-//interfaz virtual
-interface_ interfaz; 
+ 
+    @(posedge v_if.clk);
+    v_if.data_out_i_in[num] = 0;
+    v_if.pndng_i_in[num] = 0;
+    @(posedge v_if.clk);
+    @(posedge v_if.clk);
+   v_if.data_out_i_in[num] = {req.jump,req.fila_,req.columna_, req.mode, req.payload};
+    v_if.pndng_i_in[num] = 1;
+    @(posedge v_if.clk);
+   wait (v_if.popin[num]);
+//  v_if.pndng_i_in[num] = 0;
+  // wait (v_if.pndng_i_in[num] == 0);
+   
+   
+   
+   
+   $display("%0d driver %0d mensaje", num , {req.jump,req.fila_,req.columna_, req.mode, req.payload} );
+   
+   //if (count > 300)   phase.drop_objection(this);
+   //count ++;   
+   seq_item_port.item_done();
+   
 
-virtual function void build_phase(uvm_phase phase);
-super.build_phase(phase);
-
-if(!uvm_config_db #(interface_)::get(this, "", "interface_", interfaz))// se hace un ciclo if para obtener la interface virtual
-`uvm_fatal("DRV", "Could not get interfaz ") // si se cumple da como resultado el error uvm fatal
-endfunction
-
-virtual task run_phase(uvm_phase phase); 
-super.run_phase (phase);
-forever begin
-    item seq_item;
-      `uvm_info("SEQ", $formatf("Could not get secuencia "), UVM_HIGHT)
-      seq_item_port.get_next_item(seq_item);
-      drive_item(seq_item);
-      seq_item_port.item_done();
-      
-end
-endtask
-endclass
+   
+ end
+    //imprime mensaje de advertencia
+    `uvm_warning("Se hizo el reinicio en driver!",get_type_name())
+  
+  endtask
+  
+  
+endclass: driver
