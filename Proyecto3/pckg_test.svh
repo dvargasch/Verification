@@ -17,6 +17,7 @@ class agente extends uvm_agent;
   
   driver driver_ag;
   monitor monitor_ag;
+  
   //uvm_sequencer#(transaction) sequencer;
   
   string name;
@@ -50,7 +51,8 @@ class ambiente extends uvm_env;
   
   `uvm_component_utils(ambiente);
   
-  agente agente_env;
+  agente agente_env[15:0];
+  
   scoreboard scoreboard_env;
   
   uvm_analysis_port #(string) cone_score;
@@ -60,7 +62,11 @@ class ambiente extends uvm_env;
   endfunction
   
   function void build_phase(uvm_phase phase);//construir bloques
-    agente_env = agente::type_id::create("agente",this);
+    for (int i=0; i<16 ; i++ ) begin
+      automatic int a=i;
+      agente_env[a] = agente::type_id::create($sformatf("agente%0d",a),this);
+    end
+    
     scoreboard_env = scoreboard::type_id::create("scoreboard",this);
     cone_score = new("ap", null);// para la conexion del monitor scoreboard
     cone_score.connect(scoreboard_env.conec);
@@ -69,7 +75,11 @@ class ambiente extends uvm_env;
   
   virtual function void connect_phase(uvm_phase phase);//construcción de los puertos de análisis
     super.connect_phase(phase);
-    agente_env.monitor_ag.conec_mon.connect(scoreboard_env.conec);
+     for (int i=0; i<16 ; i++ ) begin
+      automatic int a=i;
+       agente_env[a].monitor_ag.conec_mon.connect(scoreboard_env.conec);
+     end
+    
     
   endfunction
   
