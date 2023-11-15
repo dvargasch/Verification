@@ -1,30 +1,64 @@
-class driver extends uvm_driver;
+class transaction  #(parameter ROWS = 4, parameter COLUMS = 4, parameter pckg_sz =40, parameter fifo_depth = 4) extends uvm_sequence_item;
   
-  `uvm_component_utils(driver)
+  `uvm_object_utils(transaction)
   
-  virtual router_if v_if;
+  bit [7:0]jump = 0;
+  rand bit [3:0]fila_;
+  rand bit [3:0]columna_;
+  rand bit mode;
+  rand bit [22:0] payload;
+  rand int source_;
   
-  function new(string name,uvm_component parent);
-    super.new(name,parent);
+  ///////////////////////
+ //  constraint modo_1 {mode == 1;};
+  constraint modo_0 {mode == 1;};
+  
+  constraint valid_source {source_ >= 0; source_ < 2*ROWS+2*COLUMS;}; 
+  //constraint itself {fila_ != pos_driver[source_].row; columna_ != pos_driver[source_].column;};
+  constraint valid_address {fila_ <= ROWS+1; fila_ >= 0; columna_ <= COLUMS+1; columna_ >= 0;};
+  constraint restricolumna_ {
+    if(fila_ == 0 | fila_ == ROWS+1) 
+      columna_ <= COLUMS & columna_ > 0;
+  };
+  constraint restrifila_ {
+    if(columna_ == 0 | columna_ == COLUMS+1) 
+      fila_ <= ROWS & fila_ > 0;
+  };
+  constraint direccion_valida_drvs {
+    if(fila_ != 0 & fila_ != ROWS+1)
+      columna_ == 0 | columna_ == COLUMS+1;
+  };
+  //Datos
+  constraint variabilidad_dato {payload > 0;};// Variabilidad maxima
+  
+  
+  
+  function new (string name = "");
+    super.new(name);
   endfunction
   
-  function void build_phase(uvm_phase phase);
-    if(!uvm_config_db#(virtual router_if)::get(this, "", "v_if", v_if)) begin
-      `uvm_error("","uvm_config_db::get failed")
+endclass: transaction
+
+class my_sequence extends uvm_sequence #(transaction);
+  
+  `uvm_object_utils(my_sequence)
+  
+  function new (string name = "");
+    super.new(name);
+  endfunction
+  
+  task body;
+    repeat(1) begin
+      req = transaction::type_id::create("req");
+      start_item(req);
+
+      if (!req.randomize()) begin
+        `uvm_error("MY_SEQUENCE", "Randomize failed.");
+      end
+
+
+      finish_item(req);
     end
-  endfunction
+  endtask: body
   
-  
-  task run_phase(uvm_phase phase);
-    v_if.reset = 1;
-    phase.raise_objection(this);
-    @(posedge v_if.clk);
-    #20;
-    v_if.reset = 0;
-    #10;
-    `uvm_warning("Se hizo el reinicio en driver!",get_type_name())
-    phase.drop_objection(this);
-  endtask
-  
-  
-endclass: driver
+endclass
