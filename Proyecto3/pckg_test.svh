@@ -4,11 +4,11 @@
 
 package test;
 import uvm_pkg::*;
-
+`include "Sequence.sv"
 `include "driver.svh"
 `include "monitor.sv"
 `include "scoreboard.sv"
-`include "Sequence.sv"
+
 
 
 //clase agente
@@ -18,30 +18,40 @@ class agente extends uvm_agent;
   driver driver_ag;
   monitor monitor_ag;
   
-  //uvm_sequencer#(transaction) sequencer;
+  uvm_sequencer#(transaction) sequencer;
   
-  string name;
+
   function new(string name, uvm_component parent);
     super.new(name,parent);
   endfunction
   
   function void build_phase(uvm_phase phase);
-    driver_ag= driver ::type_id::create("driver",this);
+    driver_ag=driver ::type_id::create("driver",this);
     monitor_ag=monitor ::type_id::create("monitor",this);
-    //sequencer = uvm_sequencer#(transaction)::type_id::create("sequencer", this);
+    sequencer = uvm_sequencer#(transaction)::type_id::create("sequencer", this);
   endfunction
   
- /* task run_phase (uvm_phase phase);
+  function void connect_phase(uvm_phase phase);
+      driver_ag.seq_item_port.connect(sequencer.seq_item_export);
+  endfunction
+  
+ task run_phase (uvm_phase phase);
     
     phase.raise_objection(this);
     begin
-     my_sequence trans;
+      my_sequence trans;
       trans = my_sequence::type_id::create("trans");
-        trans.start(sequencer);
+      
+      repeat(1) begin
+       trans.start(sequencer);
+        
+      end
+ 
+
     end
     phase.drop_objection(this);
     
-  endtask*/
+  endtask
   
 endclass
 
@@ -64,7 +74,7 @@ class ambiente extends uvm_env;
   function void build_phase(uvm_phase phase);//construir bloques
     for (int i=0; i<16 ; i++ ) begin
       automatic int a=i;
-      agente_env[a] = agente::type_id::create($sformatf("agente%0d",a),this);
+      agente_env[a] = agente::type_id::create($sformatf("agente%0d",a),this);  
     end
     
     scoreboard_env = scoreboard::type_id::create("scoreboard",this);
@@ -78,6 +88,8 @@ class ambiente extends uvm_env;
      for (int i=0; i<16 ; i++ ) begin
       automatic int a=i;
        agente_env[a].monitor_ag.conec_mon.connect(scoreboard_env.conec);
+       agente_env[a].driver_ag.num=a;// para que cada driver sepa que numero es
+       agente_env[a].monitor_ag.num=a;// para que cada monitor sepa que numero es
      end
     
     
@@ -93,7 +105,6 @@ class test extends uvm_test;
   
   function new(string name, uvm_component parent);
     super.new(name,parent);
-    
   endfunction
   
   function void build_phase(uvm_phase phase);
