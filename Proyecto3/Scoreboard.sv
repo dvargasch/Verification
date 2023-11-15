@@ -1,4 +1,5 @@
 class scoreboard extends uvm_scoreboard;
+  int c = 1;
   
   uvm_analysis_imp #(string, scoreboard) conec;
   string internal_state;
@@ -22,7 +23,8 @@ class scoreboard extends uvm_scoreboard;
   
   function write (string pkt);
    
-    $display("%s",pkt);
+    $display("[%0d] %s",c,pkt);
+    c++;
 
   endfunction
   
