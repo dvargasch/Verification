@@ -20,13 +20,13 @@ class agente extends uvm_agent;
   
   uvm_sequencer#(transaction) sequencer;
   
-  string name;
+
   function new(string name, uvm_component parent);
     super.new(name,parent);
   endfunction
   
   function void build_phase(uvm_phase phase);
-    driver_ag= driver ::type_id::create("driver",this);
+    driver_ag=driver ::type_id::create("driver",this);
     monitor_ag=monitor ::type_id::create("monitor",this);
     sequencer = uvm_sequencer#(transaction)::type_id::create("sequencer", this);
   endfunction
@@ -42,7 +42,7 @@ class agente extends uvm_agent;
       my_sequence trans;
       trans = my_sequence::type_id::create("trans");
       
-      repeat(2) begin
+      repeat(1) begin
        trans.start(sequencer);
         
       end
@@ -65,7 +65,7 @@ class ambiente extends uvm_env;
   
   scoreboard scoreboard_env;
   
-  uvm_analysis_port #(string) cone_score;
+  uvm_analysis_port #(mon_score) cone_score;
   
   function new(string name,uvm_component parent);
     super.new(name,parent);
@@ -105,7 +105,6 @@ class test extends uvm_test;
   
   function new(string name, uvm_component parent);
     super.new(name,parent);
-    
   endfunction
   
   function void build_phase(uvm_phase phase);

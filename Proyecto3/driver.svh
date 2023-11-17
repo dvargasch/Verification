@@ -5,6 +5,7 @@ class driver extends uvm_driver #(transaction);
   virtual router_if v_if; //interfaz virtual
   
   int num;
+  int numero[16] = '{01,02,03,04,10,20,30,40,51,52,53,54,15,25,35,45};
 //  int count = 0;
   
   //constructor para el driver
@@ -47,12 +48,13 @@ class driver extends uvm_driver #(transaction);
     @(posedge v_if.clk);
    wait (v_if.popin[num]);
   v_if.pndng_i_in[num] = 0;
+  v_if.data_out_i_in[num] = 0;
   // wait (v_if.pndng_i_in[num] == 0);
    
    
    
    
-   $display("%0d driver %0d mensaje", num , {req.jump,req.fila_,req.columna_, req.mode, req.payload} );
+   $display("%0d driver %b mensaje R[%0d] C[%0d] itself %2d", num , {req.fila_,req.columna_, req.mode, req.payload},req.fila_,req.columna_, numero[num]);
    
    //if (count > 300)   phase.drop_objection(this);
    //count ++;   
