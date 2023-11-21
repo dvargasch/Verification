@@ -8,6 +8,11 @@ class mon_score extends uvm_object;
   int tiempo;
   int modo;
   int dato;
+  int path [5][5];
+  int target_r;
+  int target_c;
+  int source_r;
+  int source_c;
   
   `uvm_object_utils_begin(mon_score)
   	`uvm_field_int(pkg,UVM_DEFAULT)

@@ -54,12 +54,19 @@ class monitor extends uvm_monitor;
         obj.tiempo=$time;
         obj.modo=modo;
         obj.dato=dato;
+        obj.target_r = v_if.data_out[num][31:28];
+        obj.target_c = v_if.data_out[num][27:24];
+        
+        obj.source_r = v_if.data_out[num][22:19];
+        obj.source_c = v_if.data_out[num][18:15];
         conec_mon.write (obj);
         //conec_mon.agregar_elemento(numero);
         //numero = "";
      //     count = 0;
         
-        //$display("\n %0d paquete %0d monitor \n", v_if.data_out[num][31:0], num);
+        
+        
+        $display("\n MENSAJE: %b del MONITOR [%0d] \n", numero, num);
         v_if.pop[num]=1;
         
         @(posedge v_if.clk);
