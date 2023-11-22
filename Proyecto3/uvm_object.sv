@@ -1,32 +1,55 @@
-`include "uvm_macros.svh"
-`include "pckg_test.svh"
 
-module tb_top;
+class mon_score extends uvm_object;
+  
   import uvm_pkg::*;
-  //import test::*;
   
-  bit clk_tb;
-  always #5 clk_tb <= ~clk_tb;
- 
-  router_if dut_if(clk_tb);
-  dut_wrapper dut_wr (._if (dut_if));
+  int pkg;
+  int num_mon;
+  int tiempo;
+  int modo;
+  int dato;
+  int path [5][5];
+  int target_r;
+  int target_c;
+  int source_r;
+  int source_c;
   
+  `uvm_object_utils_begin(mon_score)
+  	`uvm_field_int(pkg,UVM_DEFAULT)
+  	`uvm_field_int(num_mon,UVM_DEFAULT)
+  `uvm_object_utils_end
   
-  initial begin
-    uvm_config_db#(virtual router_if)::set(null, "*","v_if", dut_if);
-   // run_test("test");
-    run_test("test_M1");
-   //run_test("test_M0");   
-   // run_test("test_retardo");
-   // run_test("test_todos_a_uno");
-   // run_test("test_uno_a_todos");
-   // run_test("test_variabilidad");
-   //if(tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[1].rtr_ntrfs_.pop) $display("de");
-  end
+  function new(string name= "mon_score");
+    super.new(name);
+  endfunction
   
-  initial begin
-    $dumpfile("tb.vcd");
-    $dumpvars(0,tb_top);
-  end
+
+endclass
+
+
+class drv_score extends uvm_object;
   
-endmodule
+  import uvm_pkg::*;
+  
+  int pkg;
+  int num_drv;
+  int tiempo;
+  int modo;
+  int dato;
+  int path [5][5];
+  int target_r;
+  int target_c;
+  int source_r;
+  int source_c;
+  
+  `uvm_object_utils_begin(drv_score)
+  	`uvm_field_int(pkg,UVM_DEFAULT)
+  `uvm_field_int(modo,UVM_DEFAULT)
+  `uvm_object_utils_end
+  
+  function new(string name= "drv_score");
+    super.new(name);
+  endfunction
+  
+
+endclass
