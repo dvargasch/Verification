@@ -49,6 +49,10 @@ class ambiente extends uvm_env;
   scoreboard scoreboard_env;
   
   uvm_analysis_port #(mon_score) cone_score;
+  uvm_analysis_port #(drv_score) cone_score2;
+  
+  `uvm_analysis_imp_decl(pkt_drv)
+  `uvm_analysis_imp_decl(pkt_mon)
   
   function new(string name,uvm_component parent);
     super.new(name,parent);
@@ -64,6 +68,10 @@ class ambiente extends uvm_env;
     cone_score = new("ap", null);// para la conexion del monitor scoreboard
     cone_score.connect(scoreboard_env.conec);
     cone_score.resolve_bindings();
+    
+    cone_score2 = new("at", null);// para la conexion del driver scoreboard
+    cone_score2.connect(scoreboard_env.conec2);
+    cone_score2.resolve_bindings();
   endfunction
   
   virtual function void connect_phase(uvm_phase phase);//construcción de los puertos de análisis
@@ -71,6 +79,7 @@ class ambiente extends uvm_env;
      for (int i=0; i<16 ; i++ ) begin
       automatic int a=i;
        agente_env[a].monitor_ag.conec_mon.connect(scoreboard_env.conec);
+       agente_env[a].driver_ag.conec_drv.connect(scoreboard_env.conec2);
        agente_env[a].driver_ag.num=a;// para que cada driver sepa que numero es
        agente_env[a].monitor_ag.num=a;// para que cada monitor sepa que numero es
      end

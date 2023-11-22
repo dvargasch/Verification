@@ -1,26 +1,26 @@
+`uvm_analysis_imp_decl(_drv)
+`uvm_analysis_imp_decl(_mon)
+
 class scoreboard extends uvm_scoreboard;
-  int c = 1;
-  
-  uvm_analysis_imp #(mon_score, scoreboard) conec;
-  
-  //uvm_analysis_imp #(int, scoreboard) conec2;
-  
-  //int internal_state;
-  
-  // Arreglo de Hash
-  //uvm_tlm_collector #(string, int) score_arr;
-  
-  //uvm_queue #(int,scoreboard) score_arr[int];
-  
-  mon_score score_arr[int]; //Arreglo que se instancia por enteros
   
   `uvm_component_utils(scoreboard)
+  
+  int c = 1;
+  
+ // uvm_analysis_imp#(mon_score, scoreboard) conec;
+  
+  uvm_analysis_imp_drv #(drv_score, scoreboard) conec2;
+  uvm_analysis_imp_mon #(mon_score, scoreboard) conec;
+  
+  mon_score score_arr[int]; //Arreglo que se instancia por enteros
+  drv_score score_arr2[int];
+  
+  
   
   function new(string name, uvm_component parent);
     super.new(name, parent);
     conec = new("conec", this);
-    //conec2 =new ("conec2");
-    //score_arr=new("score_arr", this);
+    conec2 =new ("conec2",this);
   endfunction
   
   task run_phase(uvm_phase phase);
@@ -42,13 +42,12 @@ class scoreboard extends uvm_scoreboard;
 
   endfunction*/
   
-  function void write(mon_score pkt);
+  virtual function void write_mon(input mon_score pkt);
     
      score_arr[pkt.pkg] = pkt;
     
     //foreach (score_arr[i]) begin
-    `uvm_info("MY_SCOREBOARD_INFO", $sformatf("Monitor [%g] recibe el dato [%b] con un tiempo de envío de [%g] y con modo[%g]", score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg, score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo), UVM_LOW);
-
+    $display("Se recibió del monitor [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg,score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo);
     //$display ("Source [%0d] [%0d]  Destino [%0d][%0d]",score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c);
     
     golden_reference(pkt.pkg,score_arr[pkt.pkg].modo,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c,score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c);
@@ -57,7 +56,21 @@ class scoreboard extends uvm_scoreboard;
     //end
     c++;
       
-  endfunction
+  endfunction:write_mon
+  
+  
+  virtual function void write_drv(input drv_score pkt);
+    
+     score_arr2[pkt.pkg] = pkt;
+    
+    //foreach (score_arr[i]) begin
+    $display("Se recibió del driver [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr2[pkt.pkg].num_drv, score_arr2[pkt.pkg].pkg,score_arr2[pkt.pkg].tiempo, score_arr2[pkt.pkg].modo);
+    
+    listo=0;
+    //end
+    c++;
+      
+  endfunction:write_drv
   
   
  int r;
@@ -260,13 +273,13 @@ class scoreboard extends uvm_scoreboard;
       //sb_chk_mbx.put(drv_sb_transaction);
       
      
-      //$display("SE ENVIÓ UN PAQUETE AL CHK ");
-  // $display("SALIDA [%0d][%0d] DESTINO [%0d][%0d] modo [%0d]",source_r,source_c,target_r,target_c,modo);
-   // for (int i = 0; i <=5 ; i++)begin
-     // for (int j = 0; j <= 5; j++) begin
-       // if(score_arr[dato].path[i][j]==1)$display("ruta [%0d][%0d]",i,j);
-     // end
-    //end
+   /*   //$display("SE ENVIÓ UN PAQUETE AL CHK ");
+   $display("SALIDA [%0d][%0d] DESTINO [%0d][%0d] modo [%0d]",source_r,source_c,target_r,target_c,modo);
+    for (int i = 0; i <=5 ; i++)begin
+      for (int j = 0; j <= 5; j++) begin
+        if(score_arr[dato].path[i][j]==1)$display("ruta [%0d][%0d]",i,j);
+      end
+    end*/
     
 endtask
   

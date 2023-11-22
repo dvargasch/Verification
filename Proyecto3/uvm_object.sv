@@ -25,3 +25,31 @@ class mon_score extends uvm_object;
   
 
 endclass
+
+
+class drv_score extends uvm_object;
+  
+  import uvm_pkg::*;
+  
+  int pkg;
+  int num_drv;
+  int tiempo;
+  int modo;
+  int dato;
+  int path [5][5];
+  int target_r;
+  int target_c;
+  int source_r;
+  int source_c;
+  
+  `uvm_object_utils_begin(drv_score)
+  	`uvm_field_int(pkg,UVM_DEFAULT)
+  `uvm_field_int(modo,UVM_DEFAULT)
+  `uvm_object_utils_end
+  
+  function new(string name= "drv_score");
+    super.new(name);
+  endfunction
+  
+
+endclass
