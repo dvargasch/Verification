@@ -2,12 +2,13 @@
 `include "router_if.svh"
 `include "if.svh"
 
-package test;
+//package test;
 import uvm_pkg::*;
 `include "Sequence.sv"
 `include "driver.svh"
 `include "monitor.sv"
 `include "scoreboard.sv"
+
 
 
 
@@ -47,6 +48,8 @@ class ambiente extends uvm_env;
   agente agente_env[15:0];
   
   scoreboard scoreboard_env;
+  
+  
   
   uvm_analysis_port #(mon_score) cone_score;
   uvm_analysis_port #(drv_score) cone_score2;
@@ -150,7 +153,6 @@ class test_M1 extends test;
         super.new(name,parent);
    endfunction
   
-
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
       my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};
@@ -304,4 +306,4 @@ class test_variabilidad extends test;
     endtask
 endclass
 
-endpackage
+//endpackage

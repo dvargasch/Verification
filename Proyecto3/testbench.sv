@@ -3,13 +3,14 @@
 
 module tb_top;
   import uvm_pkg::*;
-  import test::*;
+  //import test::*;
   
   bit clk_tb;
   always #5 clk_tb <= ~clk_tb;
  
   router_if dut_if(clk_tb);
   dut_wrapper dut_wr (._if (dut_if));
+  
   
   initial begin
     uvm_config_db#(virtual router_if)::set(null, "*","v_if", dut_if);
@@ -20,6 +21,7 @@ module tb_top;
    // run_test("test_todos_a_uno");
    // run_test("test_uno_a_todos");
    // run_test("test_variabilidad");
+   //if(tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[1].rtr_ntrfs_.pop) $display("de");
   end
   
   initial begin

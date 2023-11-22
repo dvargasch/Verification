@@ -35,6 +35,8 @@ class driver extends uvm_driver #(transaction);
   
   //fase de ejecucion
   task run_phase(uvm_phase phase);
+    
+    
     v_if.reset = 1;
     
     v_if.data_out_i_in[num] = 0;
@@ -60,6 +62,11 @@ class driver extends uvm_driver #(transaction);
    req.source_r = Row[num];
    req.source_c = column[num];
    v_if.data_out_i_in[num] = {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload};
+   if((req.fila_ == Row[num]) & (req.columna_ == column[num])) begin
+     req.fila_ = column[num];
+     req.columna_ = Row[num];
+     v_if.data_out_i_in[num] = {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload};
+   end
     v_if.pndng_i_in[num] = 1;
     @(posedge v_if.clk);
    wait (v_if.popin[num]);
@@ -75,7 +82,7 @@ class driver extends uvm_driver #(transaction);
    
    
    obj = drv_score::type_id::create("drv_score");// se crea el objeto en el monitor
-        obj.pkg=v_if.data_out_i_in[num];
+        obj.pkg={req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload};
         obj.tiempo=$time;
         obj.modo=req.mode;
         obj.dato=req.payload;
