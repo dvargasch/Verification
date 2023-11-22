@@ -35,39 +35,6 @@ class agente extends uvm_agent;
       driver_ag.seq_item_port.connect(sequencer.seq_item_export);
   endfunction
   
- /*task run_phase (uvm_phase phase);
-    
-    phase.raise_objection(this);
-    begin
-      my_sequence trans;
-      trans = my_sequence::type_id::create("trans");
-      
-      //my_sequence trans1;
-      //trans1 = my_sequence::type_id::create("trans1);
-      repeat(1) begin
-       trans.start(sequencer);
-       //trans1.start(sequencer);
-        
-      end
-    end
-    //  begin
-  //    my_sequence2 trans2;
-      //  trans2 = my_sequence2::type_id::create("trans2");
-      
-      //my_sequence trans1;
-      //trans1 = my_sequence::type_id::create("trans1);
-     // repeat(1) begin
-       //trans2.start(sequencer);
-       //trans1.start(sequencer);
-        
-      //end
- 
-
-   // end
-    phase.drop_objection(this);
-    
-  endtask
- */
   
 endclass
 
@@ -118,12 +85,12 @@ class test extends uvm_test;
   `uvm_component_utils(test)
   
   ambiente ambiente_tst;
-  my_sequence	my_sequence_tst;//para modo 0
-  my_sequence2	my_sequence2_tst;//para modo 1
-  my_sequence3  my_sequence3_tst;//para retardo aleatorio
-  my_sequence4  my_sequence4_tst;//para prueba de todos a uno
-  my_sequence5  my_sequence5_tst;//para prueba de uno a todos
-  my_sequence6  my_sequence6_tst;//para variabilidad maxima
+  my_sequence	my_sequence_tst;
+  my_sequence2	my_sequence2_tst;
+  my_sequence3  my_sequence3_tst;
+  my_sequence4  my_sequence4_tst;
+  my_sequence5  my_sequence5_tst;
+  my_sequence6  my_sequence6_tst;
   
   virtual router_if v_if;
   
@@ -182,7 +149,7 @@ class test_M1 extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON MODO 1");
+     `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 1", UVM_LOW);
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;   
@@ -210,7 +177,7 @@ class test_M0 extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON MODO 0");
+      `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 0", UVM_LOW);
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -235,7 +202,8 @@ class test_retardo extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON RETARDO ALEATORIO");
+    `uvm_info("MY_INFO", "PRUEBA DE TRANSACCIONES CON RETARDO ALEATORIO", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -261,7 +229,8 @@ class test_uno_a_todos extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES QUE SALEN DE UNA MISMA FUENTE");
+     `uvm_info("MY_INFO", "PRUEBA QUE ENVÍA TRANSACCIONES DE UNA FUENTE A TODOS LOS DESTINOS", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -287,7 +256,8 @@ class test_todos_a_uno extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES HACIA EL MISMO DESTINO");
+      `uvm_info("MY_INFO", "PRUEBA QUE REALIZA TRANSACCIONES DE TODAS LAS FUENTES A UN MISMO DESTINO", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -299,9 +269,9 @@ class test_todos_a_uno extends test;
 endclass
 
 
-class test_max_variacion extends test;
-  `uvm_component_utils(test_max_variacion); // Register at the factory
-  function new(string name = "test_max_variacion", uvm_component parent=null); // Builder
+class test_variabilidad extends test;
+  `uvm_component_utils(test_variabilidad); // Register at the factory
+  function new(string name = "test_variabilidad", uvm_component parent=null); // Builder
         super.new(name,parent);
    endfunction
   
@@ -313,7 +283,8 @@ class test_max_variacion extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON MAXIMA VARIABILIDAD");
+     `uvm_info("MY_INFO", "PRUEBA DE VARIABILIDAD MAXIMA", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;

@@ -60,9 +60,10 @@ class driver extends uvm_driver #(transaction);
   // wait (v_if.pndng_i_in[num] == 0);
    
    
+   `uvm_info("MY_DRIVER_INFO", $sformatf(" Driver [%0d] que se encuentra en %2d envia el dato %b hacia el dispositivo ubicado en R[%0d] C[%0d] con un retardo de [%0d]", num ,  numero[num], {req.jump, req.fila_, req.columna_, req.mode, req.source_r, req.source_c, req.payload}, req.fila_, req.columna_, req.retardo), UVM_LOW);
+
    
-   
-   $display("Se envio del driver [%0d] el dato %b hacia el dispositivo R[%0d] C[%0d] itself %2d con un retardo de [%0d]", num , {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload},req.fila_,req.columna_, numero[num], req.retardo);
+ //  $display(" %0d driver %b mensaje R[%0d] C[%0d] itself %2d con un retardo de [%0d]", num , {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload},req.fila_,req.columna_, numero[num], req.retardo);
    
    //golden_reference(req.mode,req.fila_,req.columna_);
    

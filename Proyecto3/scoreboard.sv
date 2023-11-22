@@ -47,7 +47,8 @@ class scoreboard extends uvm_scoreboard;
      score_arr[pkt.pkg] = pkt;
     
     //foreach (score_arr[i]) begin
-    $display("Se recibió del monitor [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg,score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo);
+    `uvm_info("MY_SCOREBOARD_INFO", $sformatf("Monitor [%g] recibe el dato [%b] con un tiempo de envío de [%g] y con modo[%g]", score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg, score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo), UVM_LOW);
+
     //$display ("Source [%0d] [%0d]  Destino [%0d][%0d]",score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c);
     
     golden_reference(pkt.pkg,score_arr[pkt.pkg].modo,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c,score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c);
@@ -260,12 +261,12 @@ class scoreboard extends uvm_scoreboard;
       
      
       //$display("SE ENVIÓ UN PAQUETE AL CHK ");
-   $display("SALIDA [%0d][%0d] DESTINO [%0d][%0d] modo [%0d]",source_r,source_c,target_r,target_c,modo);
-    for (int i = 0; i <=5 ; i++)begin
-      for (int j = 0; j <= 5; j++) begin
-        if(score_arr[dato].path[i][j]==1)$display("ruta [%0d][%0d]",i,j);
-      end
-    end
+  // $display("SALIDA [%0d][%0d] DESTINO [%0d][%0d] modo [%0d]",source_r,source_c,target_r,target_c,modo);
+   // for (int i = 0; i <=5 ; i++)begin
+     // for (int j = 0; j <= 5; j++) begin
+       // if(score_arr[dato].path[i][j]==1)$display("ruta [%0d][%0d]",i,j);
+     // end
+    //end
     
 endtask
   

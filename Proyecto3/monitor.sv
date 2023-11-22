@@ -66,7 +66,7 @@ class monitor extends uvm_monitor;
         
         
         
-        $display("\n MENSAJE: %b del MONITOR [%0d] \n", numero, num);
+        `uvm_info("MY_MONITOR_INFO", $sformatf("El monitor [%0d] recibio el dato %b \n",  num , numero), UVM_LOW);
         v_if.pop[num]=1;
         
         @(posedge v_if.clk);
