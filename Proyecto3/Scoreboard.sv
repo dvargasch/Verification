@@ -1,6 +1,6 @@
 `uvm_analysis_imp_decl(_drv)
 `uvm_analysis_imp_decl(_mon)
-
+`include "path.sv"
 class scoreboard extends uvm_scoreboard;
   
   `uvm_component_utils(scoreboard)
@@ -15,7 +15,8 @@ class scoreboard extends uvm_scoreboard;
   mon_score score_arr[int]; //Arreglo que se instancia por enteros
   drv_score score_arr2[int];
   
-  
+  //tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[1].rtr_ntrfs_.pop
+  //router_tb.DUT._rw_[1]._clm_[1].rtr._nu_[0].rtr_ntrfs_.pop
   
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -25,9 +26,40 @@ class scoreboard extends uvm_scoreboard;
   
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
-    `uvm_warning("Se inicializó el scoreboard", get_type_name())
+    fork      
+      `path
+    join_none
     phase.drop_objection(this);
   endtask
+  
+  
+  
+  function void check_phase(uvm_phase phase);
+    foreach(score_arr[m])begin
+      for (int i = 0; i <=5 ; i++)begin
+        for (int j = 0; j <= 5; j++) begin
+          score_arr2[m].path[i][j] = score_arr2[m].path[i][j] + score_arr[m].path[i][j];
+        end
+      end
+    end
+    
+    foreach(score_arr2[m])begin
+      for (int i = 0; i <=5 ; i++)begin
+        for (int j = 0; j <= 5; j++) begin
+          if(score_arr2[m].path[i][j] == -1) $display("El dato [%b] no pasó por [%0d][%0d]",m,i,j);
+        end
+      end
+    end
+    
+    $display("Cantidad de datos iniciales [%0d]",score_arr2.size());
+    foreach(score_arr[i])begin
+      score_arr2.delete(i);
+    end
+    $display("Datos finales [%0d]",score_arr2.size());
+    foreach(score_arr2[i])begin
+      $display("El dato [%b] no llegó al destino", i);
+    end
+  endfunction 
   
   /*function void agregar_elemento(mon_score pkt);
     string clave;
@@ -41,7 +73,6 @@ class scoreboard extends uvm_scoreboard;
     c++;
 
   endfunction*/
-  
   virtual function void write_mon(input mon_score pkt);
     
      score_arr[pkt.pkg] = pkt;
@@ -69,7 +100,6 @@ class scoreboard extends uvm_scoreboard;
     listo=0;
     //end
     c++;
-      
   endfunction:write_drv
   
   
