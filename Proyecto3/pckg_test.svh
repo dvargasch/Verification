@@ -2,12 +2,13 @@
 `include "router_if.svh"
 `include "if.svh"
 
-package test;
+//package test;
 import uvm_pkg::*;
 `include "Sequence.sv"
 `include "driver.svh"
 `include "monitor.sv"
 `include "scoreboard.sv"
+
 
 
 
@@ -47,6 +48,8 @@ class ambiente extends uvm_env;
   agente agente_env[15:0];
   
   scoreboard scoreboard_env;
+  
+  
   
   uvm_analysis_port #(mon_score) cone_score;
   uvm_analysis_port #(drv_score) cone_score2;
@@ -150,7 +153,6 @@ class test_M1 extends test;
         super.new(name,parent);
    endfunction
   
-
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
       my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};
@@ -158,7 +160,7 @@ class test_M1 extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","PRUEBA CON TRANSACCIONES EN MODO 1");
+     `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 1", UVM_LOW);
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;   
@@ -186,7 +188,7 @@ class test_M0 extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","PRUEBA CON TRANSACCIONES EN MODO 0");
+      `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 0", UVM_LOW);
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -211,7 +213,8 @@ class test_retardo extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","PRUEBA DE TRANSACCIONES CON RETARDO ALEATORIO");
+    `uvm_info("MY_INFO", "PRUEBA DE TRANSACCIONES CON RETARDO ALEATORIO", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -237,7 +240,8 @@ class test_uno_a_todos extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","PRUEBA QUE ENVIA TRANSACCIONES DE UNA FUENTE A TODOS LOS DESTINOS");
+     `uvm_info("MY_INFO", "PRUEBA QUE ENVÍA TRANSACCIONES DE UNA FUENTE A TODOS LOS DESTINOS", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -263,7 +267,8 @@ class test_todos_a_uno extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","PRUEBA QUE REALIZA TRANSACCIONES DE TODAS LAS FUENTES A UN MISMO DESTINO");
+      `uvm_info("MY_INFO", "PRUEBA QUE REALIZA TRANSACCIONES DE TODAS LAS FUENTES A UN MISMO DESTINO", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -289,7 +294,8 @@ class test_variabilidad extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_warning("","PRUEBA DE VARIABILIDAD MAXIMA");
+     `uvm_info("MY_INFO", "PRUEBA DE VARIABILIDAD MAXIMA", UVM_LOW);
+
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -300,4 +306,4 @@ class test_variabilidad extends test;
     endtask
 endclass
 
-endpackage
+//endpackage
