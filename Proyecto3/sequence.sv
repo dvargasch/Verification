@@ -1,4 +1,4 @@
-//Proyecto 3 - Verificacion Funcional de Circuitod Integrados /////////
+//Proyecto 3 - Verificacion Funcional de Circuitos Integrados /////////
 //Profesor: Ronny Garcia Ramirez                              /////////
 //Estudiantes: Rachell Morales - Daniela Vargas               /////////
 ///////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ class my_sequence extends uvm_sequence #(transaction);//esta clase es utilizada 
   constraint trans_limit {soft trans_num inside {[50:100]};}//para limitar el numero de transacciones
   
   task body;//se activan y desactivan los constraints segun lo que se requiera
-    repeat(1) begin
+    repeat(trans_num) begin
       req = transaction::type_id::create("req"); //crea una nueva instancia del objeto transaction
       start_item(req);//inicia la ejecución de una transacción
       req.valid_source.constraint_mode(1);//fuente valida activada
@@ -120,7 +120,7 @@ class my_sequence2 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;//se activan y desactivan los constraints segun lo que se requiera
-     repeat(1) begin
+     repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
       req.valid_source.constraint_mode(1);
@@ -157,7 +157,7 @@ class my_sequence3 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
   
   task body;//se activan y desactivan los constraints segun lo que se requiera
-     repeat(1) begin
+     repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
        req.valid_source.constraint_mode(1);
@@ -193,7 +193,7 @@ class my_sequence4 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;//se activan y desactivan los constraints segun lo que se requiera
-     repeat(1) begin
+     repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
        req.valid_source.constraint_mode(1);
@@ -228,7 +228,7 @@ class my_sequence5 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;////se activan y desactivan los constraints segun lo que se requiera
-     repeat(1) begin
+     repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
        req.valid_source.constraint_mode(1);
@@ -251,7 +251,10 @@ endclass
 class my_sequence6 extends uvm_sequence #(transaction);//esta clase es utilizada para la prueba de variabilidad maxima y retardo aleatorio
   
   `uvm_object_utils(my_sequence6)//macro de UVM que proporciona utilidades básicas para un objeto UVM
-  
+ //Proyecto 3 - Verificacion Funcional de Circuitos Integrados /////////
+//Profesor: Ronny Garcia Ramirez                              /////////
+//Estudiantes: Rachell Morales - Daniela Vargas               /////////
+/////////////////////////////////////////////////////////////////////// 
   function new (string name = "my_sequence6");
     super.new(name);
   endfunction
@@ -261,7 +264,7 @@ class my_sequence6 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;
-     repeat(1) begin
+     repeat(trans_num) begin
 
       req = transaction::type_id::create("req");
       start_item(req);
