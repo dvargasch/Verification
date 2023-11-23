@@ -1,36 +1,41 @@
-`include "uvm_object.sv"
-
+//Proyecto 3 - Verificacion Funcional de Circuitos Integrados /////////
+//Profesor: Ronny Garcia Ramirez                              /////////
+//Estudiantes: Rachell Morales - Daniela Vargas               /////////
+///////////////////////////////////////////////////////////////////////
 class monitor extends uvm_monitor;
   
   import uvm_pkg::*;
   
-  `uvm_component_utils(monitor);
+  `uvm_component_utils(monitor);// Macro que proporciona funciones y métodos necesarios para el funcionamiento de UVM.
   
-  uvm_analysis_port #(mon_score) conec_mon;
+  uvm_analysis_port #(mon_score) conec_mon; // Declaración de un puerto de análisis para transacciones de monitor.
   
-  mon_score obj;
+  mon_score obj; // Declaración de una instancia de la clase 'mon_score'.
   
-  //uvm_analysis_port #(int) conec_mon2;
   
-  int pkg_sz=40;
-  int num;
-  int count = 0;
+  int pkg_sz=40; // Tamaño paquete
+  int num; // Declaración de una variable que define el número de monitor
+  int count = 0; //para contador 
   int numero;
-  bit modo;
-  int dato;
-  //int numero = [01,02,03,04,10,20,30,40,51,52,53,54,15,25,35,45];
+  bit modo; // Declaración de una variable que define si es fila o columna
+  int dato; // Declaración de una variable que define almacena el dato extraído de la interfaz virtual. 
+  
   virtual router_if v_if;
   
+  
+  //constructor para el monitor
   function new (string name, uvm_component parent);
     super.new(name,parent);
-    conec_mon=new("conec_mon",this);
+    conec_mon=new("conec_mon",this);// Creación de un puerto de análisis para el monitor.
   endfunction
   
+  
+  //fase de construccion
   function void build_phase(uvm_phase phase);
     if(!uvm_config_db#(virtual router_if)::get(this,"","v_if",v_if))begin
       `uvm_error("","uvm_config_db::get failed monitor")//si el get da negativo, o no se logra traer tira el mensaje 
     end
-    //obj = mon_score::type_id::create("mon_score");
+    
   endfunction
   
   task run_phase(uvm_phase phase);
@@ -39,18 +44,17 @@ class monitor extends uvm_monitor;
     phase.raise_objection(this);//esto para ejecutar
     begin 
     
- //   `uvm_warning("Se inicializó el monitor", get_type_name())
     forever begin
       @(posedge v_if.clk);
    //   @(posedge v_if.clk);
       if (v_if.pndng[num]==1) begin
-       // $sformat(numero,"%b",v_if.data_out[num][31:0]);
+      
         numero = v_if.data_out[num][31:0];
         modo=v_if.data_out[num][pkg_sz-17];
         dato=v_if.data_out[num][17:0];
         obj = mon_score::type_id::create("mon_score");// se crea el objeto en el monitor
         obj.pkg=numero;
-        obj.num_mon=num;
+        obj.num_mon=num;// guarda datos en la transacción obj
         obj.tiempo=$time;
         obj.modo=modo;
         obj.dato=dato;
@@ -59,14 +63,7 @@ class monitor extends uvm_monitor;
         
         obj.source_r = v_if.data_out[num][22:19];
         obj.source_c = v_if.data_out[num][18:15];
-        conec_mon.write (obj);
-        //conec_mon.agregar_elemento(numero);
-        //numero = "";
-     //     count = 0;
-        
-        
-        
-        $display("\n MENSAJE: %b del MONITOR [%0d] \n", numero, num);
+        conec_mon.write(obj);// Se escribe el objeto en el puerto de análisis del monitor.
         v_if.pop[num]=1;
         
         @(posedge v_if.clk);
@@ -74,7 +71,7 @@ class monitor extends uvm_monitor;
         v_if.pop[num]=0;
         end
       else v_if.pop[num]=0;
-      if (count > 750) begin
+      if (count > 30000) begin
         break;
       end
       count++;
