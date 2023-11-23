@@ -1,3 +1,8 @@
+//Proyecto 3 - Verificacion Funcional de Circuitos Integrados /////////
+//Profesor: Ronny Garcia Ramirez                              /////////
+//Estudiantes: Rachell Morales - Daniela Vargas               /////////
+///////////////////////////////////////////////////////////////////////
+
 module dut_wrapper (router_if _if);
   
   mesh_gnrtr DUT (
