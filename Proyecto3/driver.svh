@@ -1,13 +1,6 @@
-`include "uvm_object.sv"
-
 class driver extends uvm_driver #(transaction);
   
   `uvm_component_utils(driver)
-  
-  uvm_analysis_port #(drv_score) conec_drv;
-  
-  drv_score obj;
-  
   transaction transaccion_tst = new;
   virtual router_if v_if; //interfaz virtual
   int hold;
@@ -22,7 +15,6 @@ class driver extends uvm_driver #(transaction);
   //constructor para el driver
   function new(string name,uvm_component parent);
     super.new(name,parent);
-    conec_drv=new("conec_drv",this);
   endfunction
   
   
@@ -35,8 +27,6 @@ class driver extends uvm_driver #(transaction);
   
   //fase de ejecucion
   task run_phase(uvm_phase phase);
-    
-    
     v_if.reset = 1;
     
     v_if.data_out_i_in[num] = 0;
@@ -62,11 +52,6 @@ class driver extends uvm_driver #(transaction);
    req.source_r = Row[num];
    req.source_c = column[num];
    v_if.data_out_i_in[num] = {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload};
-   if((req.fila_ == Row[num]) & (req.columna_ == column[num])) begin
-     req.fila_ = column[num];
-     req.columna_ = Row[num];
-     v_if.data_out_i_in[num] = {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload};
-   end
     v_if.pndng_i_in[num] = 1;
     @(posedge v_if.clk);
    wait (v_if.popin[num]);
@@ -76,27 +61,8 @@ class driver extends uvm_driver #(transaction);
    
    
    
-   //$display(" %0d driver %b mensaje R[%0d] C[%0d] itself %2d con un retardo de [%0d]", num , {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload},req.fila_,req.columna_, numero[num], req.retardo);
    
-   /////////////////////////////////////////////
-   
-   
-   obj = drv_score::type_id::create("drv_score");// se crea el objeto en el monitor
-        obj.pkg={req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload};
-        obj.tiempo=$time;
-        obj.modo=req.mode;
-        obj.dato=req.payload;
-        obj.target_r = req.fila_;
-        obj.target_c = req.columna_;
-        
-        obj.source_r = req.source_r;
-        obj.source_c = req.source_c;
-   		obj.num_drv = num;
-        conec_drv.write(obj);
-   
-   
-   
-   ///////////////////////////////////////////
+   $display("Se envio del driver [%0d] el dato %b hacia el dispositivo R[%0d] C[%0d] itself %2d con un retardo de [%0d]", num , {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload},req.fila_,req.columna_, numero[num], req.retardo);
    
    //golden_reference(req.mode,req.fila_,req.columna_);
    
@@ -116,6 +82,8 @@ class driver extends uvm_driver #(transaction);
 
    
  end
+    //imprime mensaje de advertencia
+    `uvm_warning("Se hizo el reinicio en driver!",get_type_name())
   
   endtask
   

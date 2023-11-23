@@ -1,3 +1,5 @@
+`include "uvm_object.sv"
+
 class monitor extends uvm_monitor;
   
   import uvm_pkg::*;
@@ -57,14 +59,14 @@ class monitor extends uvm_monitor;
         
         obj.source_r = v_if.data_out[num][22:19];
         obj.source_c = v_if.data_out[num][18:15];
-        conec_mon.write(obj);
+        conec_mon.write (obj);
         //conec_mon.agregar_elemento(numero);
         //numero = "";
      //     count = 0;
         
         
         
-        //$display("\n MENSAJE: %b del MONITOR [%0d] \n", numero, num);
+        $display("\n MENSAJE: %b del MONITOR [%0d] \n", numero, num);
         v_if.pop[num]=1;
         
         @(posedge v_if.clk);

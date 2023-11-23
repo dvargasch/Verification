@@ -2,13 +2,12 @@
 `include "router_if.svh"
 `include "if.svh"
 
-//package test;
+package test;
 import uvm_pkg::*;
 `include "Sequence.sv"
 `include "driver.svh"
 `include "monitor.sv"
 `include "scoreboard.sv"
-
 
 
 
@@ -36,6 +35,39 @@ class agente extends uvm_agent;
       driver_ag.seq_item_port.connect(sequencer.seq_item_export);
   endfunction
   
+ /*task run_phase (uvm_phase phase);
+    
+    phase.raise_objection(this);
+    begin
+      my_sequence trans;
+      trans = my_sequence::type_id::create("trans");
+      
+      //my_sequence trans1;
+      //trans1 = my_sequence::type_id::create("trans1);
+      repeat(1) begin
+       trans.start(sequencer);
+       //trans1.start(sequencer);
+        
+      end
+    end
+    //  begin
+  //    my_sequence2 trans2;
+      //  trans2 = my_sequence2::type_id::create("trans2");
+      
+      //my_sequence trans1;
+      //trans1 = my_sequence::type_id::create("trans1);
+     // repeat(1) begin
+       //trans2.start(sequencer);
+       //trans1.start(sequencer);
+        
+      //end
+ 
+
+   // end
+    phase.drop_objection(this);
+    
+  endtask
+ */
   
 endclass
 
@@ -49,13 +81,7 @@ class ambiente extends uvm_env;
   
   scoreboard scoreboard_env;
   
-  
-  
   uvm_analysis_port #(mon_score) cone_score;
-  uvm_analysis_port #(drv_score) cone_score2;
-  
-  `uvm_analysis_imp_decl(pkt_drv)
-  `uvm_analysis_imp_decl(pkt_mon)
   
   function new(string name,uvm_component parent);
     super.new(name,parent);
@@ -71,10 +97,6 @@ class ambiente extends uvm_env;
     cone_score = new("ap", null);// para la conexion del monitor scoreboard
     cone_score.connect(scoreboard_env.conec);
     cone_score.resolve_bindings();
-    
-    cone_score2 = new("at", null);// para la conexion del driver scoreboard
-    cone_score2.connect(scoreboard_env.conec2);
-    cone_score2.resolve_bindings();
   endfunction
   
   virtual function void connect_phase(uvm_phase phase);//construcción de los puertos de análisis
@@ -82,7 +104,6 @@ class ambiente extends uvm_env;
      for (int i=0; i<16 ; i++ ) begin
       automatic int a=i;
        agente_env[a].monitor_ag.conec_mon.connect(scoreboard_env.conec);
-       agente_env[a].driver_ag.conec_drv.connect(scoreboard_env.conec2);
        agente_env[a].driver_ag.num=a;// para que cada driver sepa que numero es
        agente_env[a].monitor_ag.num=a;// para que cada monitor sepa que numero es
      end
@@ -97,12 +118,12 @@ class test extends uvm_test;
   `uvm_component_utils(test)
   
   ambiente ambiente_tst;
-  my_sequence	my_sequence_tst;
-  my_sequence2	my_sequence2_tst;
-  my_sequence3  my_sequence3_tst;
-  my_sequence4  my_sequence4_tst;
-  my_sequence5  my_sequence5_tst;
-  my_sequence6  my_sequence6_tst;
+  my_sequence	my_sequence_tst;//para modo 0
+  my_sequence2	my_sequence2_tst;//para modo 1
+  my_sequence3  my_sequence3_tst;//para retardo aleatorio
+  my_sequence4  my_sequence4_tst;//para prueba de todos a uno
+  my_sequence5  my_sequence5_tst;//para prueba de uno a todos
+  my_sequence6  my_sequence6_tst;//para variabilidad maxima
   
   virtual router_if v_if;
   
@@ -120,8 +141,8 @@ class test extends uvm_test;
           uvm_config_db#(virtual router_if)::set(this,"amb_inst.agent.*","router_if",v_if);
         //Genera la secuencia 
         my_sequence_tst = my_sequence::type_id::create("seq");
-     	my_sequence2_tst = my_sequence2::type_id::create("seq");
-     	my_sequence3_tst = my_sequence3::type_id::create("seq");
+     my_sequence2_tst = my_sequence2::type_id::create("seq");
+     my_sequence3_tst = my_sequence3::type_id::create("seq");
          my_sequence4_tst = my_sequence4::type_id::create("seq");
         my_sequence5_tst = my_sequence5::type_id::create("seq");
        my_sequence6_tst = my_sequence6::type_id::create("seq");
@@ -130,17 +151,6 @@ class test extends uvm_test;
   
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
-    for (int i=0; i<15; i++)begin
-      automatic  int a=i;
-      my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};;
-      my_sequence_tst.randomize() with {trans_num inside{[20:30]};};;
-      my_sequence3_tst.randomize() with {trans_num inside{[20:30]};};;
-      my_sequence4_tst.randomize() with {trans_num inside{[20:30]};};;
-      my_sequence5_tst.randomize() with {trans_num inside{[20:30]};};;
-      my_sequence6_tst.randomize() with {trans_num inside{[20:30]};};;
-    end
-    
-    
     #10;
     `uvm_warning("", "Inicio del Test!")
     
@@ -151,7 +161,7 @@ class test extends uvm_test;
       my_sequence3_tst.start(ambiente_tst.agente_env[a].sequencer);
       my_sequence4_tst.start(ambiente_tst.agente_env[a].sequencer);
       my_sequence5_tst.start(ambiente_tst.agente_env[a].sequencer);
-      my_sequence6_tst.start(ambiente_tst.agente_env[a].sequencer);
+         my_sequence6_tst.start(ambiente_tst.agente_env[a].sequencer);
     end
     phase.drop_objection(this);
   endtask
@@ -164,6 +174,7 @@ class test_M1 extends test;
         super.new(name,parent);
    endfunction
   
+
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
       my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};
@@ -171,7 +182,7 @@ class test_M1 extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-     `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 1", UVM_LOW);
+      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON MODO 1");
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;   
@@ -199,7 +210,7 @@ class test_M0 extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 0", UVM_LOW);
+      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON MODO 0");
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -224,8 +235,7 @@ class test_retardo extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-    `uvm_info("MY_INFO", "PRUEBA DE TRANSACCIONES CON RETARDO ALEATORIO", UVM_LOW);
-
+      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON RETARDO ALEATORIO");
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -251,8 +261,7 @@ class test_uno_a_todos extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-     `uvm_info("MY_INFO", "PRUEBA QUE ENVÍA TRANSACCIONES DE UNA FUENTE A TODOS LOS DESTINOS", UVM_LOW);
-
+      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES QUE SALEN DE UNA MISMA FUENTE");
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -278,8 +287,7 @@ class test_todos_a_uno extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-      `uvm_info("MY_INFO", "PRUEBA QUE REALIZA TRANSACCIONES DE TODAS LAS FUENTES A UN MISMO DESTINO", UVM_LOW);
-
+      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES HACIA EL MISMO DESTINO");
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -291,9 +299,9 @@ class test_todos_a_uno extends test;
 endclass
 
 
-class test_variabilidad extends test;
-  `uvm_component_utils(test_variabilidad); // Register at the factory
-  function new(string name = "test_variabilidad", uvm_component parent=null); // Builder
+class test_max_variacion extends test;
+  `uvm_component_utils(test_max_variacion); // Register at the factory
+  function new(string name = "test_max_variacion", uvm_component parent=null); // Builder
         super.new(name,parent);
    endfunction
   
@@ -305,8 +313,7 @@ class test_variabilidad extends test;
 
     virtual task run_phase(uvm_phase phase);
       phase.raise_objection(this);
-     `uvm_info("MY_INFO", "PRUEBA DE VARIABILIDAD MAXIMA", UVM_LOW);
-
+      `uvm_warning("","SE ESTA CORRIENDO LA PRUEBA EN LA QUE SE REALIZAN TRANSACCIONES CON MAXIMA VARIABILIDAD");
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
@@ -317,4 +324,4 @@ class test_variabilidad extends test;
     endtask
 endclass
 
-//endpackage
+endpackage

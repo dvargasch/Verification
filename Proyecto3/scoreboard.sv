@@ -1,78 +1,33 @@
-`uvm_analysis_imp_decl(_drv)
-`uvm_analysis_imp_decl(_mon)
-`include "path.sv"
 class scoreboard extends uvm_scoreboard;
-  
-  `uvm_component_utils(scoreboard)
-  
   int c = 1;
-  int overflow [5][5];
- // uvm_analysis_imp#(mon_score, scoreboard) conec;
   
-  uvm_analysis_imp_drv #(drv_score, scoreboard) conec2;
-  uvm_analysis_imp_mon #(mon_score, scoreboard) conec;
+  uvm_analysis_imp #(mon_score, scoreboard) conec;
+  
+  //uvm_analysis_imp #(int, scoreboard) conec2;
+  
+  //int internal_state;
+  
+  // Arreglo de Hash
+  //uvm_tlm_collector #(string, int) score_arr;
+  
+  //uvm_queue #(int,scoreboard) score_arr[int];
   
   mon_score score_arr[int]; //Arreglo que se instancia por enteros
-  drv_score score_arr2[int];
   
-  //tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[1].rtr_ntrfs_.pop
-  //router_tb.DUT._rw_[1]._clm_[1].rtr._nu_[0].rtr_ntrfs_.pop
+  `uvm_component_utils(scoreboard)
   
   function new(string name, uvm_component parent);
     super.new(name, parent);
     conec = new("conec", this);
-    conec2 =new ("conec2",this);
+    //conec2 =new ("conec2");
+    //score_arr=new("score_arr", this);
   endfunction
   
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
-    fork      
-      `path
-    join_none
+    `uvm_warning("Se inicializó el scoreboard", get_type_name())
     phase.drop_objection(this);
   endtask
-  
-  
-  
-  function void check_phase(uvm_phase phase);
-    
-    
-    for (int i = 0; i <=5 ; i++)begin
-        for (int j = 0; j <= 5; j++) begin
-          if(overflow[i][j] >=500) $display("Posible Overflow en la terminal [%0d][%0d], cantidad de datos [%0d]",i,j,overflow[i][j]);
-        end
-      end
-    
-    /*
-    foreach(score_arr[m])begin
-      for (int i = 0; i <=5 ; i++)begin
-        for (int j = 0; j <= 5; j++) begin
-          score_arr2[m].path[i][j] = score_arr2[m].path[i][j] + score_arr[m].path[i][j];
-        end
-      end
-    end*/
-    
-    foreach(score_arr2[m])begin
-      for (int i = 1; i <=5 ; i++)begin
-        for (int j = 1; j <= 5; j++) begin
-          if(score_arr2[m].path[i][j] == 1) begin
-            //$display("El dato [%b] no pasó por [%0d][%0d]",m,i,j);
-            //$display("Source: [%0d][%0d] Target: [%0d][%0d]",score_arr2[m].source_r,score_arr2[m].source_c,score_arr2[m].target_r,score_arr2[m].target_c);
-          end
-        end
-      end
-    end
-    
-    
-    $display("Cantidad de datos iniciales [%0d]",score_arr2.size());
-    foreach(score_arr[i])begin
-      score_arr2.delete(i);
-    end
-    $display("Datos finales [%0d]",score_arr2.size());
-    foreach(score_arr2[i])begin
-      //$display("El dato [%b] no llegó al destino", i);
-    end
-  endfunction 
   
   /*function void agregar_elemento(mon_score pkt);
     string clave;
@@ -86,34 +41,22 @@ class scoreboard extends uvm_scoreboard;
     c++;
 
   endfunction*/
-  virtual function void write_mon(input mon_score pkt);
+  
+  function void write(mon_score pkt);
     
      score_arr[pkt.pkg] = pkt;
     
     //foreach (score_arr[i]) begin
-    //$display("Se recibió del monitor [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg,score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo);
+    $display("Se recibió del monitor [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg,score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo);
     //$display ("Source [%0d] [%0d]  Destino [%0d][%0d]",score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c);
     
-    //golden_reference(pkt.pkg,score_arr[pkt.pkg].modo,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c,score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c);
+    golden_reference(pkt.pkg,score_arr[pkt.pkg].modo,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c,score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c);
     
     listo=0;
     //end
     c++;
       
-  endfunction:write_mon
-  
-  
-  virtual function void write_drv(input drv_score pkt);
-    
-     score_arr2[pkt.pkg] = pkt;
-    
-    //foreach (score_arr[i]) begin
-    //$display("Se recibió del driver [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr2[pkt.pkg].num_drv, score_arr2[pkt.pkg].pkg,score_arr2[pkt.pkg].tiempo, score_arr2[pkt.pkg].modo);
-    golden_reference(pkt.pkg,score_arr2[pkt.pkg].modo,score_arr2[pkt.pkg].target_r,score_arr2[pkt.pkg].target_c,score_arr2[pkt.pkg].source_r,score_arr2[pkt.pkg].source_c);
-    listo=0;
-    //end
-    c++;
-  endfunction:write_drv
+  endfunction
   
   
  int r;
@@ -138,8 +81,7 @@ class scoreboard extends uvm_scoreboard;
               cc = c;
               while((cc< target_c)&(cc<4))begin
                 //$display("Va de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -147,8 +89,7 @@ class scoreboard extends uvm_scoreboard;
                end
               while((rr<= target_r)&(rr<4))begin
                 //$display("Vainside de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -159,8 +100,7 @@ class scoreboard extends uvm_scoreboard;
               rr = r;
               cc = c;
               while((cc > target_c)&(cc>=2))begin
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -168,8 +108,7 @@ class scoreboard extends uvm_scoreboard;
                end
               while(rr<= target_r)begin
                // $display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -184,8 +123,7 @@ class scoreboard extends uvm_scoreboard;
               cc = c;
               while((cc< target_c)&(cc<=3))begin
                 //$display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -193,8 +131,7 @@ class scoreboard extends uvm_scoreboard;
               end
               while((rr>= target_r)&(rr>=2))begin
                 //$display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -208,8 +145,7 @@ class scoreboard extends uvm_scoreboard;
               //$display("rr[%0d] y cc[%0d]",rr,cc);
               while((cc > target_c)&(cc>1))begin
                 //$display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -218,8 +154,7 @@ class scoreboard extends uvm_scoreboard;
               //$display("REF RR %0d row %0d",rr,target_r;
               while((rr >= target_r)&(rr>=1))begin
                 //$display("Valoress de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -237,8 +172,7 @@ class scoreboard extends uvm_scoreboard;
               cc = c;
               while((rr< target_r)&(rr<=3))begin
                 //$display("Valores de R- %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -246,8 +180,7 @@ class scoreboard extends uvm_scoreboard;
               end
               while((cc<= target_c)&(cc<=4))begin
                 //$display("Valores de R- %0d C %0d t%0d",rr,cc,target_c);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -260,17 +193,15 @@ class scoreboard extends uvm_scoreboard;
               //$display("ORI: [%0d] [%0d] DIR: [%0d] [%0d]",source_r,source_c, drv_sb_transaction.paquete[pckg_sz-9:pckg_sz-12], target_c);
               while((rr< target_r)&(rr<=3))begin
                 //$display("Validación de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
                 rr++;
                end
-              while(cc >= target_c)begin
+              while(cc > target_c)begin
                 //$display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -284,10 +215,9 @@ class scoreboard extends uvm_scoreboard;
               //$display("ORI: [%0d] [%0d] DIR: [%0d] [%0d]",source_r,source_c, drv_sb_transaction.paquete[pckg_sz-9:pckg_sz-12], target_c);
               rr = r;
               cc = c;
-              while((rr> target_r)&(rr>=2))begin
+              while((rr>= target_r)&(rr>=2))begin
                //$display("Valores de R- %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -295,8 +225,7 @@ class scoreboard extends uvm_scoreboard;
                end
               while((cc<= target_c)&(cc<=4))begin
                 //$display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -309,8 +238,7 @@ class scoreboard extends uvm_scoreboard;
              // $display("rr[%0d] y cc[%0d]",rr,cc);
               while((rr > target_r)&(rr>1))begin
                // $display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -318,8 +246,7 @@ class scoreboard extends uvm_scoreboard;
                end
               while((cc >= target_c)&(cc>=1))begin
                 //$display("Valores de R %0d C %0d",rr,cc);
-                score_arr2[dato].path[rr][cc] = 1;
-                overflow[rr][cc] =overflow[rr][cc] + 1;
+                score_arr[dato].path[rr][cc] = 1;
                 //drv_sb_transaction.ruta[{rr,cc}]=1;
                 listo = 1;
                 //drv_sb_transaction.jump =drv_sb_transaction.jump +1;
@@ -333,12 +260,12 @@ class scoreboard extends uvm_scoreboard;
       
      
       //$display("SE ENVIÓ UN PAQUETE AL CHK ");
-   /*$display("SALIDA [%0d][%0d] DESTINO [%0d][%0d] modo [%0d]",source_r,source_c,target_r,target_c,modo);
+   $display("SALIDA [%0d][%0d] DESTINO [%0d][%0d] modo [%0d]",source_r,source_c,target_r,target_c,modo);
     for (int i = 0; i <=5 ; i++)begin
       for (int j = 0; j <= 5; j++) begin
-        if(score_arr2[dato].path[i][j]==1)$display("ruta [%0d][%0d]",i,j);
+        if(score_arr[dato].path[i][j]==1)$display("ruta [%0d][%0d]",i,j);
       end
-    end*/
+    end
     
 endtask
   
