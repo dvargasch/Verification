@@ -105,7 +105,6 @@ endclass
 class test extends uvm_test;
   `uvm_component_utils(test)
   
-  // Declaración de componentes de prueba
   ambiente ambiente_tst;
   my_sequence	my_sequence_tst;
   my_sequence2	my_sequence2_tst;
@@ -114,23 +113,17 @@ class test extends uvm_test;
   my_sequence5  my_sequence5_tst;
   my_sequence6  my_sequence6_tst;
   
-  // Interfaz virtual del enrutador
   virtual router_if v_if;
   
-  function new(string name = "test", uvm_component parent=null); // Constructor
+  function new(string name = "test", uvm_component parent=null);
     super.new(name,parent);
   endfunction
   
-  // Fase de construcción
   function void build_phase(uvm_phase phase);
     ambiente_tst = ambiente::type_id::create("ambiente",this);
     super.build_phase(phase);
   
-    // Configuración de la interfaz del router en la base de datos de configuración
-    
           uvm_config_db#(virtual router_if)::set(this,"amb_inst.agent.*","router_if",v_if);
-    
-    
         //Genera la secuencia 
         my_sequence_tst = my_sequence::type_id::create("seq");
      my_sequence2_tst = my_sequence2::type_id::create("seq");
@@ -141,12 +134,9 @@ class test extends uvm_test;
         
     endfunction
   
-  // Fase de ejecución
   task run_phase(uvm_phase phase);
-    phase.raise_objection(this);// Inicia la ejecución de la fase
-    set_global_timeout(1ms/1ps); // Configura un tiempo límite global
-    
-    // Randomización de las secuencias con restricciones
+    phase.raise_objection(this);
+    set_global_timeout(1ms/1ps);
     my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};;
     my_sequence_tst.randomize() with {trans_num inside{[20:30]};};;
     my_sequence3_tst.randomize() with {trans_num inside{[20:30]};};;
@@ -157,8 +147,6 @@ class test extends uvm_test;
     #10;
     `uvm_warning("", "Inicio del Test!")
     
-    
-    // Inicia las secuencias en los agentes del ambiente
     for (int i=0; i<15; i++)begin
       automatic  int a=i;
       my_sequence2_tst.start(ambiente_tst.agente_env[a].sequencer);
@@ -174,14 +162,13 @@ endclass
  
 
 class test_M1 extends test;
-  `uvm_component_utils(test_M1); // Registra en la fábrica
-  function new(string name = "test_M1", uvm_component parent=null); // constructor
+  `uvm_component_utils(test_M1); // Register at the factory
+  function new(string name = "test_M1", uvm_component parent=null); // Builder
         super.new(name,parent);
    endfunction
   
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-       // Randomiza la secuencia con restricciones específicas para el modo 1
       my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
@@ -189,8 +176,6 @@ class test_M1 extends test;
       phase.raise_objection(this);
      `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 1", UVM_LOW);
       
-      
-     // Inicia secuencias en agentes del ambiente de manera aleatoria
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;   
         a = $urandom_range (0, 15);        
@@ -212,7 +197,6 @@ class test_M0 extends test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-       // Randomiza la secuencia con restricciones específicas para el modo 0
       my_sequence_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
@@ -220,7 +204,6 @@ class test_M0 extends test;
       phase.raise_objection(this);
       `uvm_info("MY_INFO", "PRUEBA CON TRANSACCIONES EN MODO 0", UVM_LOW);
       
-      // Inicia secuencias en agentes del ambiente de manera aleatoria
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
         a = $urandom_range (0, 15); 
@@ -239,7 +222,6 @@ class test_retardo extends test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-      // Randomiza la secuencia con restricciones específicas para la prueba de retardo
       my_sequence3_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
@@ -247,7 +229,7 @@ class test_retardo extends test;
       phase.raise_objection(this);
     `uvm_info("MY_INFO", "PRUEBA DE TRANSACCIONES CON RETARDO ALEATORIO", UVM_LOW);
 
-      // Inicia secuencias en agentes del ambiente de manera aleatoria
+      
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
             a = $urandom_range (0, 15); 
@@ -267,7 +249,6 @@ class test_uno_a_todos extends test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-      // Randomiza la secuencia con restricciones específicas para la prueba uno a todos
       my_sequence4_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
@@ -295,7 +276,6 @@ class test_todos_a_uno extends test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-      // Randomiza la secuencia con restricciones específicas para la prueba todos a uno
       my_sequence5_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
@@ -323,7 +303,6 @@ class test_variabilidad extends test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-      // Randomiza la secuencia con restricciones específicas para la prueba de variabilidad
       my_sequence6_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
