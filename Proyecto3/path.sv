@@ -1,3 +1,8 @@
+//Proyecto 3 - Verificacion Funcional de Circuitos Integrados /////////
+//Profesor: Ronny Garcia Ramirez                              /////////
+//Estudiantes: Rachell Morales - Daniela Vargas               /////////
+///////////////////////////////////////////////////////////////////////
+
 `define path \
   begin \
       forever begin \
