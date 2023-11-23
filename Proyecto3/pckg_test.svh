@@ -1,3 +1,8 @@
+//Proyecto 3 - Verificacion Funcional de Circuitos Integrados /////////
+//Profesor: Ronny Garcia Ramirez                              /////////
+//Estudiantes: Rachell Morales - Daniela Vargas               /////////
+///////////////////////////////////////////////////////////////////////
+
 `include "Router_library.sv"
 `include "router_if.svh"
 `include "if.svh"
@@ -9,30 +14,29 @@ import uvm_pkg::*;
 `include "monitor.sv"
 `include "scoreboard.sv"
 
+///////////clase agente////////////
 
-
-
-//clase agente
-class agente extends uvm_agent;
-  `uvm_component_utils(agente)
+class agente extends uvm_agent; // Definición de la clase agente que hereda de uvm_agent
   
-  driver driver_ag;
-  monitor monitor_ag;
+  `uvm_component_utils(agente) // Macro que proporciona funciones y utilidades básicas necesarias para un componente UVM
   
-  uvm_sequencer#(transaction) sequencer;
+  driver driver_ag;// Creación de la instacia driver_ag de clase driver.
+  monitor monitor_ag;// Creación de la instacia monitor_ag de clase monitor.
+  
+  uvm_sequencer#(transaction) sequencer; // Declaración de un objeto de tipo uvm_sequencer parametrizado con el tipo transaction llamado sequencer
   
 
-  function new(string name, uvm_component parent);
+  function new(string name, uvm_component parent); // constructor
     super.new(name,parent);
   endfunction
   
-  function void build_phase(uvm_phase phase);
+  function void build_phase(uvm_phase phase); // Fase de construcción: se crean instancias de los componentes driver, monitor y sequencer
     driver_ag=driver ::type_id::create("driver",this);
     monitor_ag=monitor ::type_id::create("monitor",this);
     sequencer = uvm_sequencer#(transaction)::type_id::create("sequencer", this);
   endfunction
   
-  function void connect_phase(uvm_phase phase);
+  function void connect_phase(uvm_phase phase); // Fase de conexión: se establece la conexión entre el puerto seq_item_port del driver y la exportación seq_item_export del sequencer
       driver_ag.seq_item_port.connect(sequencer.seq_item_export);
   endfunction
   
@@ -43,16 +47,20 @@ endclass
 
 class ambiente extends uvm_env;
   
-  `uvm_component_utils(ambiente);
+  `uvm_component_utils(ambiente); // Macro que proporciona funciones y métodos necesarios para el funcionamiento de UVM.
+
   
-  agente agente_env[15:0];
+  agente agente_env[15:0];// Declaración de un array de 16 instancias de la clase 'agente'.
   
-  scoreboard scoreboard_env;
+  scoreboard scoreboard_env; // Creación de la instacia scoreboard_env de clase scoreboard.
   
   
+  ////// Declaración de un puertos de análisis para transacciones de monitor y driver/////////
   
-  uvm_analysis_port #(mon_score) cone_score;
+  uvm_analysis_port #(mon_score) cone_score; 
   uvm_analysis_port #(drv_score) cone_score2;
+  
+  //////Macro que declara la  implementación de puertos de análisis para transacciones de driver y monitor //////
   
   `uvm_analysis_imp_decl(pkt_drv)
   `uvm_analysis_imp_decl(pkt_mon)
@@ -64,25 +72,26 @@ class ambiente extends uvm_env;
   function void build_phase(uvm_phase phase);//construir bloques
     for (int i=0; i<16 ; i++ ) begin
       automatic int a=i;
-      agente_env[a] = agente::type_id::create($sformatf("agente%0d",a),this);  
+      agente_env[a] = agente::type_id::create($sformatf("agente%0d",a),this);  // Creación de 16 instancias de la clase 'agente'.
     end
     
     scoreboard_env = scoreboard::type_id::create("scoreboard",this);
-    cone_score = new("ap", null);// para la conexion del monitor scoreboard
+    cone_score = new("ap", null);// Creación de un puerto de análisis para la conexion del monitor al scoreboard
     cone_score.connect(scoreboard_env.conec);
     cone_score.resolve_bindings();
     
-    cone_score2 = new("at", null);// para la conexion del driver scoreboard
+    cone_score2 = new("at", null);// Creación de un puerto de análisis para la conexion del driver al scoreboard
     cone_score2.connect(scoreboard_env.conec2);
     cone_score2.resolve_bindings();
   endfunction
   
-  virtual function void connect_phase(uvm_phase phase);//construcción de los puertos de análisis
+  virtual function void connect_phase(uvm_phase phase);//conexión de puertos
     super.connect_phase(phase);
      for (int i=0; i<16 ; i++ ) begin
       automatic int a=i;
-       agente_env[a].monitor_ag.conec_mon.connect(scoreboard_env.conec);
-       agente_env[a].driver_ag.conec_drv.connect(scoreboard_env.conec2);
+       agente_env[a].monitor_ag.conec_mon.connect(scoreboard_env.conec);// Conexión de los puertos de análisis del monitor al scoreboard.
+       agente_env[a].driver_ag.conec_drv.connect(scoreboard_env.conec2); // Conexión de los puertos de análisis del driver al scoreboard.
+       
        agente_env[a].driver_ag.num=a;// para que cada driver sepa que numero es
        agente_env[a].monitor_ag.num=a;// para que cada monitor sepa que numero es
      end
@@ -112,11 +121,8 @@ class test extends uvm_test;
   
   function void build_phase(uvm_phase phase);
     ambiente_tst = ambiente::type_id::create("ambiente",this);
-    super.build_phase(phase);//n
+    super.build_phase(phase);
   
-    //Verifica si se conecto correctamente al interface
-    //if(!uvm_config_db#(virtual router_if)::get(this,"","router_if",v_if))
-           // `uvm_fatal("Test","Could not get vif")
           uvm_config_db#(virtual router_if)::set(this,"amb_inst.agent.*","router_if",v_if);
         //Genera la secuencia 
         my_sequence_tst = my_sequence::type_id::create("seq");
@@ -125,11 +131,19 @@ class test extends uvm_test;
          my_sequence4_tst = my_sequence4::type_id::create("seq");
         my_sequence5_tst = my_sequence5::type_id::create("seq");
        my_sequence6_tst = my_sequence6::type_id::create("seq");
-        //seq.randomize() with {trans_num inside{[30:40]};};
+        
     endfunction
   
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
+    set_global_timeout(1ms/1ps);
+    my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};;
+    my_sequence_tst.randomize() with {trans_num inside{[20:30]};};;
+    my_sequence3_tst.randomize() with {trans_num inside{[20:30]};};;
+    my_sequence4_tst.randomize() with {trans_num inside{[20:30]};};;
+    my_sequence5_tst.randomize() with {trans_num inside{[20:30]};};;
+    my_sequence6_tst.randomize() with {trans_num inside{[20:30]};};;
+    
     #10;
     `uvm_warning("", "Inicio del Test!")
     
@@ -245,7 +259,7 @@ class test_uno_a_todos extends test;
       
       for (int i=0; i<15; i++)begin
       	automatic  int a=i;
-   //        a = $urandom_range (0); 
+   
                a = 0; 
       my_sequence4_tst.start(ambiente_tst.agente_env[a].sequencer);
       end
@@ -306,4 +320,3 @@ class test_variabilidad extends test;
     endtask
 endclass
 
-//endpackage
