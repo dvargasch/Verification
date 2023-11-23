@@ -45,8 +45,9 @@ class drv_score extends uvm_object; // Clase para comunicación entre driver y e
   int source_c; // Campo para almacenar la columna de origen
   
   `uvm_object_utils_begin(drv_score)
-  	`uvm_field_int(pkg,UVM_DEFAULT) // Macro para especificar el campo 'pkg' como un campo de objeto UVM
-  	`uvm_field_int(modo,UVM_DEFAULT) // Macro para especificar el campo 'modo' como un campo de objeto UVM
+  `uvm_field_int(pkg,UVM_BIN) // Macro para especificar el campo 'pkg' como un campo de objeto UVM
+  `uvm_field_int(num_drv,UVM_DEC)// Macro para especificar el campo 'srv_num' como un campo de objeto UVM
+  `uvm_field_int(modo,UVM_DEC) // Macro para especificar el campo 'modo' como un campo de objeto UVM
   `uvm_object_utils_end // Macro que finaliza la definición de campos y funciones UVM
   
   function new(string name = "drv_score"); // Constructor de la clase
