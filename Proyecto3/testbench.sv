@@ -1,3 +1,8 @@
+//Proyecto 3 - Verificacion Funcional de Circuitos Integrados /////////
+//Profesor: Ronny Garcia Ramirez                              /////////
+//Estudiantes: Rachell Morales - Daniela Vargas               /////////
+///////////////////////////////////////////////////////////////////////
+
 `include "uvm_macros.svh"
 `include "pckg_test.svh"
 
@@ -14,14 +19,14 @@ module tb_top;
   
   initial begin
     uvm_config_db#(virtual router_if)::set(null, "*","v_if", dut_if);
-   // run_test("test");
-    run_test("test_M1");
+    run_test("test");
+   //run_test("test_M1");
    //run_test("test_M0");   
-   // run_test("test_retardo");
-   // run_test("test_todos_a_uno");
+    //run_test("test_retardo");
+   //run_test("test_todos_a_uno");
    // run_test("test_uno_a_todos");
    // run_test("test_variabilidad");
-   //if(tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[1].rtr_ntrfs_.pop) $display("de");
+
   end
   
   initial begin
