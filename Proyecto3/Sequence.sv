@@ -83,6 +83,7 @@ class my_sequence extends uvm_sequence #(transaction);//esta clase es utilizada 
   constraint trans_limit {soft trans_num inside {[50:100]};}//para limitar el numero de transacciones
   
   task body;//se activan y desactivan los constraints segun lo que se requiera
+    `uvm_info("PRUEBA MODO 0", $sformatf("Comenzando en el tiempo %0t", $realtime), UVM_LOW);//indica en cual prueba se utiliza esta frecuencia
     repeat(trans_num) begin
       req = transaction::type_id::create("req"); //crea una nueva instancia del objeto transaction
       start_item(req);//inicia la ejecución de una transacción
@@ -100,7 +101,7 @@ class my_sequence extends uvm_sequence #(transaction);//esta clase es utilizada 
       if (!req.randomize()) begin
         `uvm_error("MY_SEQUENCE", "Randomize failed.");//si la aleatorizacion falla envia un mensaje de error
      end
-      `uvm_info("PRUEBA MODO 0", $sformatf("Comenzando en el tiempo %0t", $realtime), UVM_LOW);//indica en cual prueba se utiliza esta frecuencia
+      
       finish_item(req);
     end
   endtask: body
@@ -120,6 +121,7 @@ class my_sequence2 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;//se activan y desactivan los constraints segun lo que se requiera
+    `uvm_info("PRUEBA MODO 1", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
      repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
@@ -137,7 +139,7 @@ class my_sequence2 extends uvm_sequence #(transaction);//esta clase es utilizada
         `uvm_error("MY_SEQUENCE", "Randomize failed.");
      end
        
-       `uvm_info("PRUEBA MODO 1", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
+       
        finish_item(req);
      end
   endtask: body
@@ -157,6 +159,7 @@ class my_sequence3 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
   
   task body;//se activan y desactivan los constraints segun lo que se requiera
+     `uvm_info("PRUEBA RETARDO ALEATORIO", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
      repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
@@ -172,7 +175,7 @@ class my_sequence3 extends uvm_sequence #(transaction);//esta clase es utilizada
        req.variabilidad_dato.constraint_mode(0);
        req.static_destiny.constraint_mode(0);
        req.randomize();
-       `uvm_info("PRUEBA RETARDO ALEATORIO", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
+      
         finish_item(req);
     end
   endtask: body
@@ -193,6 +196,7 @@ class my_sequence4 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;//se activan y desactivan los constraints segun lo que se requiera
+    `uvm_info("PRUEBA UNO A TODOS", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
      repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
@@ -206,7 +210,7 @@ class my_sequence4 extends uvm_sequence #(transaction);//esta clase es utilizada
        req.static_destiny.constraint_mode(0);
        req.valid_address.constraint_mode(1);
        req.variabilidad_dato.constraint_mode(0);
-       `uvm_info("PRUEBA UNO A TODOS", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
+       
        
        req.randomize();
         finish_item(req);
@@ -228,6 +232,7 @@ class my_sequence5 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;////se activan y desactivan los constraints segun lo que se requiera
+    `uvm_info("PRUEBA TODOS A UNO", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
      repeat(trans_num) begin
       req = transaction::type_id::create("req");
       start_item(req);
@@ -239,7 +244,7 @@ class my_sequence5 extends uvm_sequence #(transaction);//esta clase es utilizada
        req.retardo_aleat.constraint_mode(0);
        req.static_destiny.constraint_mode(1);//se activa que el destino sea estatico
        req.variabilidad_dato.constraint_mode(0);
-       `uvm_info("PRUEBA TODOS A UNO", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
+       
        req.randomize();
         finish_item(req);
     end
@@ -264,6 +269,7 @@ class my_sequence6 extends uvm_sequence #(transaction);//esta clase es utilizada
   constraint trans_limit {soft trans_num inside {[50:60]};}//para limitar el numero de transacciones
  
   task body;
+    `uvm_info("PRUEBA VARIABILIDAD MAXIMA", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
      repeat(trans_num) begin
 
       req = transaction::type_id::create("req");
@@ -277,7 +283,7 @@ class my_sequence6 extends uvm_sequence #(transaction);//esta clase es utilizada
        req.static_destiny.constraint_mode(0);
        req.variabilidad_dato.constraint_mode(1);//se activa la varialbilidad
        req.randomize();
-       `uvm_info("PRUEBA VARIABILIDAD MAXIMA", $sformatf("Comenzando la simulación en %0t", $realtime), UVM_LOW);
+       
       
        finish_item(req);
     end
