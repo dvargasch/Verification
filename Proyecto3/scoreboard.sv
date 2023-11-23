@@ -57,8 +57,6 @@ class scoreboard extends uvm_scoreboard;
       for (int i = 1; i <=5 ; i++)begin
         for (int j = 1; j <= 5; j++) begin
           if(score_arr2[m].path[i][j] == 1) begin
-            $display("El dato [%b] no pasó por [%0d][%0d]",m,i,j);
-            $display("Source: [%0d][%0d] Target: [%0d][%0d]",score_arr2[m].source_r,score_arr2[m].source_c,score_arr2[m].target_r,score_arr2[m].target_c);
           end
         end
       end
@@ -70,6 +68,7 @@ class scoreboard extends uvm_scoreboard;
     `uvm_info("REPORT",$sformatf("Cantidad de Transacciones Recibidas %0.2f",score_arr.size()),UVM_LOW)
     
     foreach(score_arr[i])begin
+      //score_arr[i].print();
       time_prom = (score_arr[i].tiempo - score_arr2[i].tiempo)+time_prom;
     end
     `uvm_info("REPORT",$sformatf("Retardo Promedio %0.2f",time_prom/score_arr.size()),UVM_LOW)
@@ -77,6 +76,11 @@ class scoreboard extends uvm_scoreboard;
       score_arr2.delete(i);
     end
     `uvm_info("REPORT",$sformatf("Cantidad de Transacciones Perdidas %0.2f",score_arr2.size()),UVM_LOW)
+    
+    `uvm_info("REPORT","REPORTE DE PAQUETES PERDIDOS",UVM_LOW)
+    foreach(score_arr2[i])begin
+      score_arr2[i].print();
+    end
     
   endfunction 
  
