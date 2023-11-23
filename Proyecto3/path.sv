@@ -5,17 +5,11 @@
 
 `define path \
   begin \
-    // Bucle infinito activado por flanco de subida de una señal específica
       forever begin \
           @(posedge tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[0].rtr_ntrfs_.pop); \
-        
-         // Actualiza un elemento específico en un arreglo basado en los datos de la señal
-        score_arr2[tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[0].rtr_ntrfs_.data_out[31:0]].path[1][1] = 0; \
+          score_arr2[tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[0].rtr_ntrfs_.data_out[31:0]].path[1][1] = 0; \
       end \
   end \
-
-// se repite muchas veces más con distintos arreglos y señales
-
   begin \
       forever begin \
           @(posedge tb_top.dut_wr.DUT._rw_[1]._clm_[1].rtr._nu_[1].rtr_ntrfs_.pop); \
