@@ -295,6 +295,7 @@ class test_todos_a_uno extends test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
+      // Randomiza la secuencia con restricciones específicas para la prueba todos a uno
       my_sequence5_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
@@ -322,6 +323,7 @@ class test_variabilidad extends test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
+      // Randomiza la secuencia con restricciones específicas para la prueba de variabilidad
       my_sequence6_tst.randomize() with {trans_num inside{[20:30]};};
     endfunction
 
