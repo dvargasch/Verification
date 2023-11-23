@@ -76,7 +76,7 @@ class driver extends uvm_driver #(transaction);
    
    
    
-   $display(" %0d driver %b mensaje R[%0d] C[%0d] itself %2d con un retardo de [%0d]", num , {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload},req.fila_,req.columna_, numero[num], req.retardo);
+   //$display(" %0d driver %b mensaje R[%0d] C[%0d] itself %2d con un retardo de [%0d]", num , {req.jump,req.fila_,req.columna_, req.mode,req.source_r,req.source_c ,req.payload},req.fila_,req.columna_, numero[num], req.retardo);
    
    /////////////////////////////////////////////
    
@@ -116,8 +116,6 @@ class driver extends uvm_driver #(transaction);
 
    
  end
-    //imprime mensaje de advertencia
-    `uvm_warning("Se hizo el reinicio en driver!",get_type_name())
   
   endtask
   

@@ -64,7 +64,7 @@ class monitor extends uvm_monitor;
         
         
         
-        $display("\n MENSAJE: %b del MONITOR [%0d] \n", numero, num);
+        //$display("\n MENSAJE: %b del MONITOR [%0d] \n", numero, num);
         v_if.pop[num]=1;
         
         @(posedge v_if.clk);

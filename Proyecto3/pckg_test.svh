@@ -120,8 +120,8 @@ class test extends uvm_test;
           uvm_config_db#(virtual router_if)::set(this,"amb_inst.agent.*","router_if",v_if);
         //Genera la secuencia 
         my_sequence_tst = my_sequence::type_id::create("seq");
-     my_sequence2_tst = my_sequence2::type_id::create("seq");
-     my_sequence3_tst = my_sequence3::type_id::create("seq");
+     	my_sequence2_tst = my_sequence2::type_id::create("seq");
+     	my_sequence3_tst = my_sequence3::type_id::create("seq");
          my_sequence4_tst = my_sequence4::type_id::create("seq");
         my_sequence5_tst = my_sequence5::type_id::create("seq");
        my_sequence6_tst = my_sequence6::type_id::create("seq");
@@ -130,6 +130,17 @@ class test extends uvm_test;
   
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
+    for (int i=0; i<15; i++)begin
+      automatic  int a=i;
+      my_sequence2_tst.randomize() with {trans_num inside{[20:30]};};;
+      my_sequence_tst.randomize() with {trans_num inside{[20:30]};};;
+      my_sequence3_tst.randomize() with {trans_num inside{[20:30]};};;
+      my_sequence4_tst.randomize() with {trans_num inside{[20:30]};};;
+      my_sequence5_tst.randomize() with {trans_num inside{[20:30]};};;
+      my_sequence6_tst.randomize() with {trans_num inside{[20:30]};};;
+    end
+    
+    
     #10;
     `uvm_warning("", "Inicio del Test!")
     
@@ -140,7 +151,7 @@ class test extends uvm_test;
       my_sequence3_tst.start(ambiente_tst.agente_env[a].sequencer);
       my_sequence4_tst.start(ambiente_tst.agente_env[a].sequencer);
       my_sequence5_tst.start(ambiente_tst.agente_env[a].sequencer);
-         my_sequence6_tst.start(ambiente_tst.agente_env[a].sequencer);
+      my_sequence6_tst.start(ambiente_tst.agente_env[a].sequencer);
     end
     phase.drop_objection(this);
   endtask

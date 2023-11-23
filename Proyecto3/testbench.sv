@@ -14,8 +14,8 @@ module tb_top;
   
   initial begin
     uvm_config_db#(virtual router_if)::set(null, "*","v_if", dut_if);
-   // run_test("test");
-    run_test("test_M1");
+    run_test("test");
+   //run_test("test_M1");
    //run_test("test_M0");   
    // run_test("test_retardo");
    // run_test("test_todos_a_uno");

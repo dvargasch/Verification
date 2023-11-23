@@ -39,7 +39,7 @@ class scoreboard extends uvm_scoreboard;
     
     for (int i = 0; i <=5 ; i++)begin
         for (int j = 0; j <= 5; j++) begin
-          if(overflow[i][j] >=5) $display("Posible Overflow en la terminal [%0d][%0d], cantidad de datos [%0d]",i,j,overflow[i][j]);
+          if(overflow[i][j] >=500) $display("Posible Overflow en la terminal [%0d][%0d], cantidad de datos [%0d]",i,j,overflow[i][j]);
         end
       end
     
@@ -51,17 +51,17 @@ class scoreboard extends uvm_scoreboard;
         end
       end
     end*/
-    /*
+    
     foreach(score_arr2[m])begin
       for (int i = 1; i <=5 ; i++)begin
         for (int j = 1; j <= 5; j++) begin
           if(score_arr2[m].path[i][j] == 1) begin
-            $display("El dato [%b] no pasó por [%0d][%0d]",m,i,j);
-            $display("Source: [%0d][%0d] Target: [%0d][%0d]",score_arr2[m].source_r,score_arr2[m].source_c,score_arr2[m].target_r,score_arr2[m].target_c);
+            //$display("El dato [%b] no pasó por [%0d][%0d]",m,i,j);
+            //$display("Source: [%0d][%0d] Target: [%0d][%0d]",score_arr2[m].source_r,score_arr2[m].source_c,score_arr2[m].target_r,score_arr2[m].target_c);
           end
         end
       end
-    end*/
+    end
     
     
     $display("Cantidad de datos iniciales [%0d]",score_arr2.size());
@@ -70,7 +70,7 @@ class scoreboard extends uvm_scoreboard;
     end
     $display("Datos finales [%0d]",score_arr2.size());
     foreach(score_arr2[i])begin
-      $display("El dato [%b] no llegó al destino", i);
+      //$display("El dato [%b] no llegó al destino", i);
     end
   endfunction 
   
@@ -91,7 +91,7 @@ class scoreboard extends uvm_scoreboard;
      score_arr[pkt.pkg] = pkt;
     
     //foreach (score_arr[i]) begin
-    $display("Se recibió del monitor [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg,score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo);
+    //$display("Se recibió del monitor [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr[pkt.pkg].num_mon, score_arr[pkt.pkg].pkg,score_arr[pkt.pkg].tiempo, score_arr[pkt.pkg].modo);
     //$display ("Source [%0d] [%0d]  Destino [%0d][%0d]",score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c);
     
     //golden_reference(pkt.pkg,score_arr[pkt.pkg].modo,score_arr[pkt.pkg].target_r,score_arr[pkt.pkg].target_c,score_arr[pkt.pkg].source_r,score_arr[pkt.pkg].source_c);
@@ -108,7 +108,7 @@ class scoreboard extends uvm_scoreboard;
      score_arr2[pkt.pkg] = pkt;
     
     //foreach (score_arr[i]) begin
-    $display("Se recibió del driver [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr2[pkt.pkg].num_drv, score_arr2[pkt.pkg].pkg,score_arr2[pkt.pkg].tiempo, score_arr2[pkt.pkg].modo);
+    //$display("Se recibió del driver [%g] el dato [%b] con un tiempo de envío de [%g] y con modo[%g]",score_arr2[pkt.pkg].num_drv, score_arr2[pkt.pkg].pkg,score_arr2[pkt.pkg].tiempo, score_arr2[pkt.pkg].modo);
     golden_reference(pkt.pkg,score_arr2[pkt.pkg].modo,score_arr2[pkt.pkg].target_r,score_arr2[pkt.pkg].target_c,score_arr2[pkt.pkg].source_r,score_arr2[pkt.pkg].source_c);
     listo=0;
     //end
